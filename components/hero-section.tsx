@@ -1,10 +1,28 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "./ui/button";
 import Link from "next/link"
-import { ArrowRight, Flame } from "lucide-react";
+import { ArrowRight, Code, Flame, Zap } from "lucide-react";
+
+function CodeLine({
+    lineNum,
+    children
+}: {
+    lineNum: number;
+    children: React.ReactNode
+}) {
+    return (
+        <div className="flex items-start gap-4 py-0.5 hover:bg-secondary/30 px-1 -mx-1 rounded-sm transition-colors">
+            <span className="text-muted-foreground/40 select-none w-6 text-right shrink-0 text-xs leading-relaxed">
+                {lineNum}
+            </span>
+            <span className="flex-1">
+                {children}
+            </span>
+        </div>
+    )
+}
 
 export function HeroSection() {
-
     const stats = [
         { label: 'Challenges', value: "15+" },
         { label: 'Coders', value: "1" },
@@ -33,6 +51,7 @@ export function HeroSection() {
                         variant="outline"
                         className="mb-8 border-primary/30 bg-primary/5 text-primary px-4 py-1.5 text-xs font-mono tracking-wider uppercase"
                     >
+                        <Zap className="w-3 h-3 mr-1.5" />
                         Beta version
                     </Badge>
 
@@ -90,9 +109,51 @@ export function HeroSection() {
                     <div className="mt-20 w-full max-w-3xl">
                         <div className="rounded-lg border border-border/60 bg-card overflow-hidden doom-border-glow">
                             <div className="flex items-center gap-2 px-4 py-3 bg-secondary/50 border-b border-border/50">
-                                <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
-                                <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
-                            </div>                        
+                                <div className="flex gap-1.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-doom-lava/40" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
+                                </div>
+                                <span className="text-xs text-muted-foreground font-mono ml-2">
+                                    two_sum.py
+                                </span>
+                            </div>
+                            <div className="p-5 font-mono text-sm leading-relaxed text-left overflow-x-auto">
+                                <CodeLine lineNum={1}>
+                                    <span className="text-primary">def</span>{" "}
+                                    <span className="text-foreground">two_sum</span>
+                                    <span className="text-muted-foreground">(</span>
+                                    <span className="text-doom-lava">nums</span>
+                                    <span className="text-muted-foreground">,</span>{" "}
+                                    <span className="text-doom-lava">target</span>
+                                    <span className="text-muted-foreground">):</span>
+                                </CodeLine>
+                                <CodeLine lineNum={2}>
+                                    <span className="text-muted-foreground pl-8">{"seen = {}"}</span>
+                                </CodeLine>
+                                <CodeLine lineNum={3}>
+                                    <span className="text-primary pl-8">for</span>{" "}
+                                    <span className="text-foreground">i, num</span>{" "}
+                                    <span className="text-primary">in</span>{" "}
+                                    <span className="text-foreground">enumerate(nums):</span>
+                                </CodeLine>
+                                <CodeLine lineNum={4}>
+                                    <span className="text-muted-foreground pl-16">{"diff = target - num"}</span>
+                                </CodeLine>
+                                <CodeLine lineNum={5}>
+                                    <span className="text-primary pl-16">if</span>{" "}
+                                    <span className="text-foreground">diff</span>{" "}
+                                    <span className="text-primary">in</span>{" "}
+                                    <span className="text-foreground">seen:</span>
+                                </CodeLine>
+                                <CodeLine lineNum={6}>
+                                    <span className="text-primary pl-24">return</span>{" "}
+                                    <span className="text-muted-foreground">{"[seen[diff], i]"}</span>
+                                </CodeLine>
+                                <CodeLine lineNum={7}>
+                                    <span className="text-muted-foreground pl-16">{"seen[num] = i"}</span>
+                                </CodeLine>
+                            </div>
                         </div>
                     </div>
 
