@@ -1,13 +1,13 @@
 import type { Metadata, Viewport} from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google"
+import { Oxanium, Source_Code_Pro } from "next/font/google"
 import "@/styles/globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const oxanium = Oxanium({
   subsets: ["latin"],
   variable: "--font-sans"
 })
 
-const jetbrainsMono = JetBrains_Mono({
+const sourceCodePro = Source_Code_Pro({
   subsets: ["latin"],
   variable: "--font-mono"
 })
@@ -31,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`dark ${oxanium.variable} ${sourceCodePro.variable}`}>
       <body
         className="font-sans antialiased min-h-screen bg-background text-foreground"
       >
