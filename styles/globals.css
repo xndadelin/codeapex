@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 :root {
+  --font-sans: var(--font-sans), "Oxanium", sans-serif;
+  --font-mono: var(--font-mono), "Source Code Pro", monospace;
   --background: #cccccc;
   --foreground: #1f1f1f;
   --card: #b0b0b0;
@@ -56,6 +58,8 @@
 }
 
 .dark {
+  --font-sans: var(--font-sans), "Oxanium", sans-serif;
+  --font-mono: var(--font-mono), "Source Code Pro", monospace;
   --background: #1a1a1a;
   --foreground: #e0e0e0;
   --card: #2a2a2a;

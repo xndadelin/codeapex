@@ -127,5 +127,4 @@ export function Navbar() {
             )}
         </header>
     )
-
 }
