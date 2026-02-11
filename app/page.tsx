@@ -1,3 +1,4 @@
+import { FeaturesSection } from "@/components/features-section";
 import { HeroSection } from "@/components/hero-section";
 import { Navbar } from "@/components/navbar";
 import Image from "next/image";
@@ -8,6 +9,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1 w-full">
         <HeroSection />
+        <FeaturesSection />
       </main>
     </div>
   );
