@@ -1,12 +1,54 @@
+"use client"
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, Flame, Github, Slack, Terminal } from "lucide-react";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import z from "zod";
+
+const signupSchema = z.object({
+    username: z
+        .string()
+        .min(3, "Username must be at least 3 characters.")
+        .max(20, "Username must be at most 20 characters.")
+        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain numbers, letters and underscores."),
+    email: z
+        .string()
+        .min(1, "Email is required!")
+        .email("Invalid email address."),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters.")
+})
+
+type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
+
+  const {
+    register, 
+    handleSubmit, 
+    formState: {
+        errors, 
+        isSubmitting
+    },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema)
+  })
+
+  const onSubmit = async(data: SignupFormData) => {
+    try {
+        console.log(data)
+    } catch (error) {
+        console.error(error)
+    }
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
@@ -73,7 +115,7 @@ export default function SignupPage() {
             </span>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-sm text-foreground">
                 Username
@@ -82,8 +124,14 @@ export default function SignupPage() {
                 id="username"
                 type="text"
                 placeholder="Orpheus"
+                {...register("username")}
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
+              {errors.username && (
+                <p className="text-xs text-destructive">
+                    {errors.username?.message}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm text-foreground">
@@ -92,9 +140,15 @@ export default function SignupPage() {
               <Input
                 id="email"
                 type="email"
+                {...register("email")}
                 placeholder="daemon@codeapex.dev"
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
+              {errors.email && (
+                    <p className="text-xs text-destructive">
+                        {errors.email?.message}
+                    </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm text-foreground">
@@ -104,12 +158,19 @@ export default function SignupPage() {
                 id="password"
                 type="password"
                 placeholder="Min. 8 characters"
+                {...register("password")}
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
+              {errors.password && (
+                    <p className="text-xs text-destructive">
+                        {errors.password?.message}
+                    </p>
+              )}
             </div>
 
             <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11 doom-glow"
             >
                 <Flame className="w-4 h-4" />
