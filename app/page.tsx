@@ -1,3 +1,4 @@
+import { CTASection } from "@/components/cta-section";
 import { FeaturesSection } from "@/components/features-section";
 import { HeroSection } from "@/components/hero-section";
 import { Navbar } from "@/components/navbar";
@@ -12,6 +13,7 @@ export default function Home() {
         <HeroSection />
         <FeaturesSection />
         <ProblemsSection />
+        <CTASection />
       </main>
     </div>
   );
