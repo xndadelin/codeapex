@@ -1,6 +1,8 @@
 import type { Metadata, Viewport} from "next";
 import { Oxanium, Source_Code_Pro } from "next/font/google"
 import "@/styles/globals.css";
+import { QueryProvider } from "@/providers/query_provider";
+import { AuthProvider } from "@/providers/auth_provider";
 
 const oxanium = Oxanium({
   subsets: ["latin"],
@@ -35,7 +37,11 @@ export default function RootLayout({
       <body
         className="font-sans antialiased min-h-screen bg-background text-foreground"
       >
-        {children}
+        <QueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
