@@ -10,7 +10,7 @@ import { ArrowLeft, Flame, Github, Loader2, Slack, Terminal } from "lucide-react
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import z from "zod";
-import { useSignup, useOAuthLogin } from "@/hooks/use-auth";
+import { useLogin, useOAuthLogin } from "@/hooks/use-auth";
 
 // todo: add metadata (refactor this into a server component later)
 // export const metadata = {
@@ -18,25 +18,19 @@ import { useSignup, useOAuthLogin } from "@/hooks/use-auth";
 //  description: "Create your CodeApex account and start your coding journey today!"
 //}
 
-const signupSchema = z.object({
-    username: z
-        .string()
-        .min(3, "Username must be at least 3 characters.")
-        .max(20, "Username must be at most 20 characters.")
-        .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain numbers, letters and underscores."),
-    email: z
-        .string()
-        .min(1, "Email is required!")
-        .email("Invalid email address."),
-    password: z
-        .string()
-        .min(8, "Password must be at least 8 characters.")
+const signinSchema = z.object({
+        password: z
+            .string(),
+        email: z
+            .string()
+            .min(1, "Email is required!")
+            .email("Invalid email address."),
 })
 
-type SignupFormData = z.infer<typeof signupSchema>
+type SigninFormData = z.infer<typeof signinSchema>
 
-export default function SignupPage() {
-  const signupMutation = useSignup()
+export default function SigninPage() {
+  const signinMutation = useLogin()
   const oauthMutation = useOAuthLogin()
 
   const {
@@ -46,19 +40,19 @@ export default function SignupPage() {
         errors, 
         isSubmitting
     },
-  } = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema)
+  } = useForm<SigninFormData>({
+    resolver: zodResolver(signinSchema)
   })
 
-  const onSubmit = async(data: SignupFormData) => {
-    signupMutation.mutate(data)
+  const onSubmit = async(data: SigninFormData) => {
+    signinMutation.mutate(data)
   }
 
   const handleOAuth = (provider: "slack_oidc" | "github") => {
     oauthMutation.mutate(provider)
   }
 
-  const isLoading = signupMutation.isPending || oauthMutation.isPending
+  const isLoading = signinMutation.isPending || oauthMutation.isPending
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
@@ -94,19 +88,19 @@ export default function SignupPage() {
             </span>
           </Link>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            Create your account
+            Welcome back!
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Begin your coding journey!
+            Happy to see you come back!
           </p>
         </div>
       </div>
       <Card className="bg-card/50 border-border/50 doom-border-glow w-full max-w-md">
         <CardContent className="p-6">
-          {signupMutation.isError && (
+          {signinMutation.isError && (
             <div className="mb-4 p-4 rounded-md bg-destructive/10 border border-destructive/20">
               <p className="text-sm text-destructive">
-                {signupMutation.error?.message || "Something went wrong."}
+                {signinMutation.error?.message || "Something went wrong."}
               </p>
             </div>
           )}
@@ -149,26 +143,8 @@ export default function SignupPage() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <p className="mt-4 text-center text-[11px] text-muted-foreground/60 leading-relaxed">
-              Hi there, unfortunately email signup is in maintenance. Please bear with me! Until Nest is back up, continue with either Slack or Github.
+              Hi there, unfortunately email signin is in maintenance. Please bear with me! Until Nest is back up, continue with either Slack or Github.
             </p>
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm text-foreground">
-                Username
-              </Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Orpheus"
-                {...register("username")}
-                disabled={true}
-                className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
-              />
-              {errors.username && (
-                <p className="text-xs text-destructive">
-                    {errors.username?.message}
-                </p>
-              )}
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm text-foreground">
                 Email
@@ -211,35 +187,25 @@ export default function SignupPage() {
                 disabled={true}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11 doom-glow"
             >
-                {signupMutation.isPending ? (
+                {signinMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin " />
                 ): (
                   <Flame className="w-4 h-4" />
                 )}
-                {signupMutation.isPending ? "Creating account..." : "Create account"}
+                {signinMutation.isPending ? "Login in..." : "Login"}
             </Button>
           </form>
 
-          <p className="mt-4 text-center text-[11px] text-muted-foreground/60 leading-relaxed">
-            Hi there! By creating an account, you agree to our{" "}
-            <Link href="/tos" className="text-primary/70 hover:text-primary transition-colors">
-                Terms of Service
-            </Link>{" "}and{" "}
-            <Link href="pp" className="text-primary/70 hover:text-primary transition-colors">
-                Privacy policy
-            </Link>
-            .
-          </p>
         </CardContent>
       </Card>
 
       <p className="mt-6 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
+        You do not have an account?{" "}
         <Link
-            href="/login"
+            href="/signup"
             className="text-primary hover:text-primary/80 font-medium transition-colors"
         >
-            Sign in
+            Sign up
         </Link>
       </p>
 
