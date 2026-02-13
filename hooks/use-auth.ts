@@ -116,3 +116,15 @@ export function useOAuthLogin() {
         },
     })
 }
+
+export function useLogout() {
+    return useMutation({
+        mutationFn: async() => {
+            const supabase = createClient()
+
+            const { error } = await supabase.auth.signOut()
+
+            if(error) throw error
+        }
+    })
+}

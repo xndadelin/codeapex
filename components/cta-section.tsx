@@ -1,22 +1,23 @@
 import { Flame, Terminal } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function CTASection() {
+  const router = useRouter()
  return (
      <section className="relative py-24 lg:py-32">
     <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full bg-primary-5 blur-[120px]" />
     </div>
     <div className="relative mx-auto max-w-7xl px-6">
-      <div className="relative rounded-xl border border:border-50 bg-card/30 p-8 sm:p-12 lg:p-16 overflow-hidden doom-border-glow">
+      <div className="relative rounded-xl bg-card/30 p-8 sm:p-12 lg:p-16 overflow-hidden doom-border-glow">
         <div
           className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
         />
-        <div className="absolute -top-20 right-0 w-[300px] h-[300px] rounded-full bg-primary/5 blur-[80px]" />
         <div className="relative flex flex-col items-center text-center">
-          <div className="mb-6 flex items-center justify-center w-14 h-14 rounded-lg bg-primary/10 border border-primary/20">
+          <div className="mb-6 flex items-center justify-center w-14 h-14 rounded-lg bg-primary/10">
             <Terminal className="w-7 h-7 text-primary" />
           </div>
 

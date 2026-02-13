@@ -4,8 +4,14 @@ import { useState } from "react"
 import Link from "next/link"
 import { Menu, X, Terminal, Flame } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useAuthStore } from "@/hooks/useAuthStore"
+import { Avatar, AvatarImage } from "./ui/avatar"
+import { DropdownMenuContent, DropdownMenuGroup, DropdownMenuTrigger, DropdownMenu, DropdownMenuItem, DropdownMenuSeparator } from "./ui/dropdown-menu"
+import { useLogout } from "@/hooks/use-auth"
 
 export function Navbar() {
+    const { isAuthenticated, user } = useAuthStore()
+    const logoutmutation = useLogout()
     const [mobileOpen, setMobileOpen] = useState<boolean>(false)
 
     const navLinks = [
@@ -52,25 +58,53 @@ export function Navbar() {
                 <div
                     className="hidden md:flex items-center gap-3"
                 >
-                    <Button
-                        variant={"ghost"}
-                        size="sm"
-                        className="text-muted-foreground hover:text-foreground"
-                        asChild
-                    >
-                        <Link href="/login">
-                            Sign In
-                        </Link>
-                    </Button>
-                    <Button
-                        size={"sm"}
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" asChild
-                    >
-                        <Link href={"/signup"}>
-                            <Flame className="w-4 h-4" />
-                            Get started
-                        </Link>
-                    </Button>
+                    {!isAuthenticated ? (
+                        <>
+                            <Button
+                                variant={"ghost"}
+                                size="sm"
+                                className="text-muted-foreground hover:text-foreground"
+                                asChild
+                            >
+                                <Link href="/login">
+                                    Sign In
+                                </Link>
+                            </Button>
+                            <Button
+                                size={"sm"}
+                                className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" asChild
+                            >
+                                <Link href={"/signup"}>
+                                    <Flame className="w-4 h-4" />
+                                    Get started
+                                </Link>
+                            </Button>
+                        </>
+                    ): (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant={"ghost"} size="icon" className="rounded-full">
+                                    <Avatar>
+                                    <AvatarImage src={user?.user_metadata?.avatar_url} alt="pfp" />
+                                </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-32">
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                                </DropdownMenuGroup>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem variant="destructive" onClick={() => {
+                                                logoutmutation.mutate()
+                                    }}>
+                                        Logout
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
                 </div>
 
                 <button
@@ -102,25 +136,53 @@ export function Navbar() {
                             </Link>
                         ))}
                         <div className="flex flex-col gap-2 pt-4 border-5 border-border/50 mt-2">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="justify-start text-muted-foreground"
-                                asChild
-                            >
-                                <Link href={"/login"}>
-                                    Sign In
-                                </Link>
-                            </Button>
-                            <Button
-                                size={"sm"}
-                                className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" asChild
-                            >
-                                <Link href={"/signup"}>
-                                    <Flame className="w-4 h-4" />
-                                    Get started
-                                </Link>
-                            </Button>
+                            {!isAuthenticated ? (
+                                <>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="justify-start text-muted-foreground"
+                                        asChild
+                                    >
+                                        <Link href={"/login"}>
+                                            Sign In
+                                        </Link>
+                                    </Button>
+                                    <Button
+                                        size={"sm"}
+                                        className="bg-primary text-primary-foreground hover:bg-primary/90 gap-1.5" asChild
+                                    >
+                                        <Link href={"/signup"}>
+                                            <Flame className="w-4 h-4" />
+                                            Get started
+                                        </Link>
+                                    </Button>
+                                </>
+                            ): (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant={"ghost"} size="icon" className="rounded-full">
+                                            <Avatar>
+                                            <AvatarImage src={user?.user_metadata?.avatar_url} alt="pfp" />
+                                        </Avatar>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent className="w-32">
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuItem>Profile</DropdownMenuItem>
+                                            <DropdownMenuItem>Settings</DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            <DropdownMenuItem variant="destructive" onClick={() => {
+                                                logoutmutation.mutate()
+                                            }}>
+                                                Logout
+                                            </DropdownMenuItem>
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            )}
                         </div>
                     </div>
                 </div>
