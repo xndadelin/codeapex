@@ -59,7 +59,7 @@ export function HeroSection() {
                         className="text-balance max-w-4xl text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
                     >  
                         Conquer code.{" "}
-                        <span className="text-primary doom-glow-text">
+                        <span className="text-primary">
                             Dominate
                         </span>{" "}
                         Algorithms.

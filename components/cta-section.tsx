@@ -23,7 +23,7 @@ export function CTASection() {
 
           <h2 className="text-balance text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Ready to enter the{" "}
-            <span className="text-primary doom-glow-text">arena</span>?
+            <span className="text-primary">arena</span>?
           </h2>
           <p className="mt-4 max-w-lg text-pretty text-muted-foreground leading-relaxed">
             Join CodeApex and start solving coding challenges to sharpen your
