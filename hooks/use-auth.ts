@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useAuthStore } from "./useAuthStore"
 import { createClient } from "@/utils/supabase/client"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { Provider } from "@supabase/supabase-js"
+
+// not sure exactly why signup does not work (the signup confirmation email does not go through, will come back after nest is up and i have my precius mail back)
 
 interface SignupCredentials {
     username: string
@@ -23,6 +25,7 @@ export const authKeys = {
 
 export function useUser() {
     const { setUser } = useAuthStore()
+    const router = useRouter()
 
     return useQuery({
         queryKey: authKeys.user(),
@@ -49,12 +52,7 @@ export function useSignup() {
             const supabase = createClient()
             const { data, error } = await supabase.auth.signUp({
                 email: credentials.email,
-                password: credentials.password,
-                options: {
-                    data: {
-                        username: credentials.username
-                    }
-                }
+                password: credentials.password
             })
             if(error) throw error
             if(!data.user) throw new Error("Signup failed!")
@@ -62,15 +60,11 @@ export function useSignup() {
             return data
         },
         onSuccess: (data) => {
+            console.log(data)
             setUser(data.user)
             queryClient.invalidateQueries({
                 queryKey: authKeys.all
             })
-            if(data.user?.identities?.length === 0) {
-                router.push("/signup/verify-email")
-            } else {
-                router.push("/")
-            }
         }
     })
 }

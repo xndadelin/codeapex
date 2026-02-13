@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, Flame, Github, Slack, Terminal } from "lucide-react";
+import { ArrowLeft, Flame, Github, Loader2, Slack, Terminal } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import z from "zod";
+import { useSignup, useOAuthLogin } from "@/hooks/use-auth";
 
 const signupSchema = z.object({
     username: z
@@ -29,6 +30,8 @@ const signupSchema = z.object({
 type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignupPage() {
+  const signupMutation = useSignup()
+  const oauthMutation = useOAuthLogin()
 
   const {
     register, 
@@ -42,12 +45,14 @@ export default function SignupPage() {
   })
 
   const onSubmit = async(data: SignupFormData) => {
-    try {
-        console.log(data)
-    } catch (error) {
-        console.error(error)
-    }
+    signupMutation.mutate(data)
   }
+
+  const handleOAuth = (provider: "slack_oidc" | "github") => {
+    oauthMutation.mutate(provider)
+  }
+
+  const isLoading = signupMutation.isPending || oauthMutation.isPending
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
@@ -92,19 +97,40 @@ export default function SignupPage() {
       </div>
       <Card className="bg-card/50 border-border/50 doom-border-glow w-full max-w-md">
         <CardContent className="p-6">
+          {signupMutation.isError && (
+            <div className="mb-4 p-4 rounded-md bg-destructive/10 border border-destructive/20">
+              <p className="text-sm text-destructive">
+                {signupMutation.error?.message || "Something went wrong."}
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-3">
             <Button
               variant={"outline"}
+              type="button"
+              disabled={isLoading}
+              onClick={() => handleOAuth("github")}
               className="bg-transparent border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 gap-2"
             >
-              <Github className="w-4 h-4" />
+              {oauthMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ): (
+                <Github className="w-4 h-4" />
+              )}
               Github
             </Button>
             <Button
               variant={"outline"}
+              type="button"
+              disabled={isLoading}
+              onClick={() => handleOAuth("slack_oidc")}
               className="bg-transparent border-border/60 text-muted-foreground hover:text-foreground hover:border-primary/40 gap-2"
             >
-              <Slack className="w-4 h-4" />
+              {oauthMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ): (
+                <Slack className="w-4 h-4" />
+              )}
               Slack
             </Button>
           </div>
@@ -116,6 +142,9 @@ export default function SignupPage() {
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <p className="mt-4 text-center text-[11px] text-muted-foreground/60 leading-relaxed">
+              Hi there, unfortunately email signup is in maintenance. Please bear with me! Until Nest is back up, continue with either Slack or Github.
+            </p>
             <div className="space-y-2">
               <Label htmlFor="username" className="text-sm text-foreground">
                 Username
@@ -125,6 +154,7 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Orpheus"
                 {...register("username")}
+                disabled={true}
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
               {errors.username && (
@@ -141,6 +171,7 @@ export default function SignupPage() {
                 id="email"
                 type="email"
                 {...register("email")}
+                disabled={true}
                 placeholder="daemon@codeapex.dev"
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
@@ -158,6 +189,7 @@ export default function SignupPage() {
                 id="password"
                 type="password"
                 placeholder="Min. 8 characters"
+                disabled={true}
                 {...register("password")}
                 className="bg-secondary/30 border-border/50 text-foreground placeholder:text-muted-foreground/50 font-mono text-sm focus-visible:ring-primary/50"
               />
@@ -170,11 +202,15 @@ export default function SignupPage() {
 
             <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={true}
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11 doom-glow"
             >
-                <Flame className="w-4 h-4" />
-                Create account
+                {signupMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin " />
+                ): (
+                  <Flame className="w-4 h-4" />
+                )}
+                {signupMutation.isPending ? "Creating account..." : "Create account"}
             </Button>
           </form>
 
