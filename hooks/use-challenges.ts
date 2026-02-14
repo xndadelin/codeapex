@@ -10,6 +10,7 @@ interface Challenge_Line {
     category: string,
     tags: string[],
     is_public: boolean
+    acceptance: number
 }
 
 interface Challenge {
