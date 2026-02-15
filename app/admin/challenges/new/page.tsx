@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Shield } from "lucide-react";
+import { ArrowLeft, FileCode, FileCode2, Shield } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -58,9 +58,9 @@ export default function NewProblemPage() {
     const [tags, setTags] = useState<string>("")
     const [description, setDescription] = useState<string>("")
     const [constraints, setConstraints] = useState<string>("")
-    const [starterCode, setStarterCode] = useState<string>("`def solution():\n    pass`")
+    const [starterCode, setStarterCode] = useState<string>("def solution():\n    pass")
     const [solutionCode, setSolutionCode] = useState<string>("")
-
+    const [testingCode, setTestingCode] = useState<string>("")
     const [isPublic, setIsPublic] = useState<boolean>(false)
     const [timeLimit, setTimeLimit] = useState<number>(1000)
     const [memoryLimit, setMemoryLimit] = useState<number>(256)
@@ -242,8 +242,7 @@ export default function NewProblemPage() {
                                     </div>
                                 </CardContent>                            
                             </Card>
-
-                            <Card className="bg-card/50 border-border/50">
+                             <Card className="bg-card/50 border-border/50">
                                 <CardContent className="p-6">
                                     <h2 className="text-lg font-semibold text-foreground mb-6">
                                         Problem description
@@ -253,10 +252,65 @@ export default function NewProblemPage() {
                                             <Label htmlFor="description" className="text-sm text-foreground">
                                                 Description
                                             </Label>
+                                            <textarea
+                                                id="description"
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                placeholder="Describe the problem statement in details. Use Markdown formatting."
+                                                rows={8}
+                                                className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="constraints" className="text-sm text-foreground">
+                                                Constraints
+                                            </Label>
+                                            <textarea
+                                                id="constraints"
+                                                value={constraints}
+                                                onChange={(e) => setConstraints(e.target.value)}
+                                                placeholder={`One constraint per line, eg: \n2 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9
+                                                `}
+                                                rows={4}
+                                                className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
+                                            />
                                         </div>
                                     </div>
                                 </CardContent>                     
                             </Card>
+
+                           <Card className="bg-card/50 border-border/50">
+                                <CardContent className="p-6">
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <FileCode2 className="w-5 h-5 text-primary" />
+                                        <h2 className="text-lg font-semibold text-foreground">
+                                            Starter code
+                                        </h2>
+                                    </div>
+                                    <textarea
+                                        value={starterCode}
+                                        onChange={(e) => setStarterCode(e.target.value)}
+                                        rows={10}
+                                        className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
+                                        spellCheck={false}
+                                    />
+                                    <Separator className="my-6 bg-border/30" />
+                                     <div className="flex items-center gap-2 mb-6">
+                                        <FileCode className="w-5 h-5 text-primary" />
+                                        <h2 className="text-lg font-semibold text-foreground">
+                                            Testing code
+                                        </h2>
+                                    </div>
+                                    <textarea
+                                        value={testingCode}
+                                        onChange={(e) => setTestingCode(e.target.value)}
+                                        rows={10}
+                                        className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
+                                        spellCheck={false}
+                                    />
+                                </CardContent>
+                           </Card>
+                             
                         </div>
                     </div>
                 </section>
