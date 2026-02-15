@@ -3,7 +3,7 @@
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge, Plus, Search, Shield } from "lucide-react";
+import { Badge, Edit3, Eye, Plus, Search, Shield, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { usePaginatedChallenges } from "@/hooks/use-challenges";
@@ -112,10 +112,38 @@ export default function AdminDashboardPage() {
                                                     </BadgeUI>
                                                 )}
                                             </div>
-                                            <div className="hidden sm:block">
+                                            <div className="hidden sm:block w-full text-center">
                                                 <BadgeUI className={`text-9px font-mono ${difficultyColors[problem.difficulty]}`} variant={"outline"}>
                                                     {problem.difficulty}
                                                 </BadgeUI>
+                                            </div>
+                                            <span className="hidden sm:block text-xs text-muted-foreground font-mono w-full">
+                                                {problem.submissions.toLocaleString() || 0}
+                                            </span>
+                                            <span className="hidden sm:block text-xs text-muted-foreground font-mono">
+                                                {problem.acceptance || 0}%
+                                            </span>
+                                            <div className="flex items-center gap-1">
+                                                <Button variant={"ghost"} size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" asChild>
+                                                    <Link href={`/admin/challenges/${problem.id}`}>
+                                                        <Eye className="w-3.5 h-3.5" />
+                                                        <span className="sr-only">View</span>
+                                                    </Link>
+                                                </Button>
+                                                <Button variant={"ghost"} size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary" asChild>
+                                                    <Link href={`/admin/challenges/${problem.id}/edit`}>
+                                                        <Edit3 className="w-3.5 h-3.5" />
+                                                        <span className="sr-only">
+                                                            Edit
+                                                        </span>
+                                                    </Link>
+                                                </Button>
+                                                <Button variant={"ghost"} size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-red-400">
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    <span className="sr-only">
+                                                        Delete
+                                                    </span>
+                                                </Button>
                                             </div>
                                         </div>
                                     ))}
