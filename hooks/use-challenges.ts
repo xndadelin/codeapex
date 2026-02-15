@@ -6,7 +6,6 @@ interface Challenge_Line {
     id: UUID,
     title: string,
     difficulty: string,
-    difficulty_points: number,
     category: string,
     tags: string[],
     is_public: boolean
@@ -18,7 +17,6 @@ interface Challenge {
     id: UUID,
     title: string,
     difficulty: string,
-    difficulty_points: number,
     category: string,
     tags: string[],
     description: string,
@@ -95,7 +93,7 @@ export function useListChallenges() {
         queryKey: challengeKeys.listLine("public"),
         queryFn: async() => {
             const supabase = createClient()
-            const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions").eq("is_public", true)
+            const { data, error } = await supabase.from("challenges").select("id, title, difficulty,category, tags, is_public, acceptance, submissions").eq("is_public", true)
 
             if(error) throw error
             return data as Challenge_Line[]
@@ -108,7 +106,7 @@ export function useListAdminChallenges() {
         queryKey: challengeKeys.listLine("admin"),
         queryFn: async() => {
             const supabase = createClient()
-            const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions")
+            const { data, error } = await supabase.from("challenges").select("id, title, difficulty,category, tags, is_public, acceptance, submissions")
 
             if(error) throw error
             return data as Challenge_Line[]
@@ -125,7 +123,7 @@ export function usePaginatedChallenges(page: number, pageSize: number, scope: "p
             const from = page * pageSize
             const to = from + pageSize - 1
 
-            let query = supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions", {
+            let query = supabase.from("challenges").select("id, title, difficulty,category, tags, is_public, acceptance, submissions", {
                 count: "exact"
             }).range(from, to)
 
