@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { UUID } from "crypto";
 
 interface Challenge_Line {
@@ -46,8 +46,8 @@ export const challengeKeys = {
     listLine: (scope: "public" | "admin") => [...challengeKeys.all, "list-line", scope] as const,
     details: () => [...challengeKeys.all, "details"] as const,
     detail: (id: UUID) => [...challengeKeys.details(), id] as const,
-    paginated: (page: number, pageSize: number, scope?: "public" | "admin") => 
-        [...challengeKeys.all, "paginated", { page, pageSize, scope }] as const 
+    paginated: (page: number, pageSize: number, scope?: "public" | "admin", searchQuery?: string | "") => 
+        [...challengeKeys.all, "paginated", { page, pageSize, scope, searchQuery}] as const 
 }
 
 export function useChallenges() {
@@ -116,9 +116,9 @@ export function useListAdminChallenges() {
     })
 }
 
-export function usePaginatedChallenges(page: number, pageSize: number, scope: "public" | "admin" = "public") {
+export function usePaginatedChallenges(page: number, pageSize: number, scope: "public" | "admin" = "public", searchQuery?: string | "") {
     return useQuery<PaginatedChallenges>({
-        queryKey: challengeKeys.paginated(page, pageSize, scope),
+        queryKey: challengeKeys.paginated(page, pageSize, scope, searchQuery),
         queryFn: async() => {
             const supabase = createClient()
 
@@ -133,6 +133,10 @@ export function usePaginatedChallenges(page: number, pageSize: number, scope: "p
                 query = query.eq("is_public", true)
             }
 
+            if(searchQuery && searchQuery.trim() !== "") {
+                query = query.ilike("title", `%${searchQuery.trim()}%`)
+            }
+
             const { data, error, count } = await
                 query
         
@@ -141,6 +145,6 @@ export function usePaginatedChallenges(page: number, pageSize: number, scope: "p
                 challenges: (data ?? []) as Challenge_Line[],
                 count: count ?? 0
             }
-        },
+        }
     })
 }

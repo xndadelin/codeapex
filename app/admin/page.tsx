@@ -20,14 +20,12 @@ const difficultyColors: Record<string, string> = {
 
 export default function AdminDashboardPage() {
     const [searchQuery, setSearchQuery] = useState<string>("")
-    const PAGE_SIZE = 1
+    const PAGE_SIZE = 10
     const [page, setPage] = useState<number>(1)
-    const { data, isLoading } = usePaginatedChallenges(page - 1, PAGE_SIZE, "admin")
+    const { data, isLoading } = usePaginatedChallenges(page - 1, PAGE_SIZE, "admin", searchQuery)
     const challenges = data?.challenges ?? []
     const count = data?.count ?? 0
     const totalPages = Math.ceil(count / PAGE_SIZE)
-
-    const filteredChallenges = challenges?.filter(challenge => challenge.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -94,11 +92,11 @@ export default function AdminDashboardPage() {
                                             Actions
                                         </span>
                                     </div>
-                                    {filteredChallenges?.map((problem, idx) => (
+                                    {data?.challenges?.map((problem, idx) => (
                                         <div
                                             key={problem.id}
                                             className={`grid sm:grid-cols-[50px_1fr_90px_100px_90px_100px] gap-3 px-4 py-3 items-center hover:bg-primary/10 transition-colors ${
-                                                idx < filteredChallenges.length - 1 ? "border-b border-border/30" : ""
+                                                idx < challenges.length - 1 ? "border-b border-border/30" : ""
                                             }`}
                                         >
                                             <span className="text-xs text-muted-foreground font-mono">
