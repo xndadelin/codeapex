@@ -2,33 +2,20 @@
 
 import { Navbar } from "@/components/navbar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, FileCode, FileCode2, Shield } from "lucide-react";
+import { ArrowLeft, Eye, FileCode, FileCode2, Save, Shield } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
 const defaultTestCasesJson = JSON.stringify([
-    {
-      input: { nums: [2, 7, 11, 15], target: 9 },
-      output: [0, 1],
-      is_sample: true,
-    },
-    {
-      input: { nums: [3, 2, 4], target: 6 },
-      output: [1, 2],
-      is_sample: true,
-    },
-    {
-      input: { nums: [3, 3], target: 6 },
-      output: [0, 1],
-      is_sample: false,
-    },
-    null,
-    2,
-])
+  { input: "2 7 11 15\n9", output: "0 1", is_sample: true },
+  { input: "3 2 4\n6", output: "1 2", is_sample: true },
+  { input: "3 3\n6", output: "0 1", is_sample: false },
+]);
 
 const difficultyColors: Record<string, string> = {
     "Easy": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
@@ -59,12 +46,43 @@ export default function NewProblemPage() {
     const [description, setDescription] = useState<string>("")
     const [constraints, setConstraints] = useState<string>("")
     const [starterCode, setStarterCode] = useState<string>("def solution():\n    pass")
-    const [solutionCode, setSolutionCode] = useState<string>("")
-    const [testingCode, setTestingCode] = useState<string>("")
     const [isPublic, setIsPublic] = useState<boolean>(false)
     const [timeLimit, setTimeLimit] = useState<number>(1000)
     const [memoryLimit, setMemoryLimit] = useState<number>(256)
     const [testCasesJson, setTestCasesJson] = useState(defaultTestCasesJson)
+
+    const validation = (() => {
+        try {
+            const parsed = JSON.parse(testCasesJson)
+            if(!Array.isArray(parsed)) return {
+                valid: false,
+                count: 0,
+                samples: 0,
+                error: "Must be a JSON array"
+            }
+            const allValid = parsed.every((tc: Record<string, any>) => typeof tc === "object" && tc !== null && "input" in tc && "output" in tc && "is_sample" in tc)
+            if(!allValid) return {
+                valid: false,
+                count: parsed.length,
+                samples: 0,
+                error: 'Each object needs "input", "output" and "is_sample" keys.'
+            }
+            const samples = parsed.filter((tc: Record<string, any>) => tc.is_sample === true).length
+            return {
+                valid: true,
+                count: parsed.length,
+                samples, 
+                error: null
+            }
+        } catch {
+            return {
+                valid: false,
+                count: 0,
+                samples: 0,
+                error: "Invalid JSON syntax"
+            }
+        }
+    })
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -294,23 +312,65 @@ export default function NewProblemPage() {
                                         className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
                                         spellCheck={false}
                                     />
-                                    <Separator className="my-6 bg-border/30" />
-                                     <div className="flex items-center gap-2 mb-6">
-                                        <FileCode className="w-5 h-5 text-primary" />
-                                        <h2 className="text-lg font-semibold text-foreground">
-                                            Testing code
-                                        </h2>
-                                    </div>
-                                    <textarea
-                                        value={testingCode}
-                                        onChange={(e) => setTestingCode(e.target.value)}
-                                        rows={10}
-                                        className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
-                                        spellCheck={false}
-                                    />
                                 </CardContent>
                            </Card>
-                             
+                          <Card className="bg-card/50 border-border/50">
+                                <CardContent className="p-6">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h2 className="text-lg font-semibold text-foreground">
+                                            Test cases (JSON format)
+                                        </h2>
+                                        <div className="flex items-center gap-2">
+                                            {testCasesJson.trim() && (
+                                                <Badge
+                                                    variant={"outline"}
+                                                    className={`text-[10px] px-1.5 py-0 font-mono ${validation().valid ? "border-emerald-500/40 text-emerald-400" : "border-red-500/40 text-red-400"}`}
+
+                                                >
+                                                    {validation().valid ? `${validation().count} tests (${validation().samples} samples)`: "Invalid"}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-muted-foreground mb-4 font-mono leading-relaxed">
+                                        {'A JSON array of objects. Each object needs "input", "output", and "is_sample" (boolean) keys.'}
+                                            <br />
+                                        {'Test cases with "is_sample": true are shown as examples to users.'}
+                                    </p>
+                                    {validation().error && (
+                                        <p className="text-xs text-red-400 mb-4 font-mono">
+                                            {validation().error}
+                                        </p>
+                                    )}
+                                    <textarea
+                                        value={testCasesJson}
+                                        onChange={(e) => setTestCasesJson(e.target.value)}
+                                        rows={20}
+                                        spellCheck={false}
+                                        className={`w-full rounded-md bg-secondary/30 border text-foreground font-mono text-xs p-4 resize-y outline-none focus-visible:ring-2 focus-visible:ring-offset-0 leading-relaxed ${
+                                            validation().valid || !testCasesJson.trim() ? "border-border/50 focus-visible:ring-primary/50" : "border-red-500/30 focus-visible:ring-red-500/50"
+                                        }`}
+                                    />
+                                </CardContent>
+                          </Card>
+                          <div className="flex items-center justify-between pt-4">
+                            <Button variant={"outline"} className="cursor-pointer bg-transparent border-border/50 text-muted-foreground hover:text-foreground gap-2" asChild>
+                                <Link href="/admin">
+                                    <ArrowLeft className="w-4 h-4" />
+                                    Cancel
+                                </Link>
+                            </Button>
+                            <div className="flex items-center gap-3">
+                                <Button variant={"outline"} className="cursor-pointer bg-transparent border-border/50 text-muted-foreground hover:text-foreground gap-2">
+                                    <Eye className="w-4 h-4" />
+                                    Save as draft
+                                </Button>
+                                <Button className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 gap-2">
+                                    <Save className="w-4 h-4" />
+                                    Publish challenge
+                                </Button>
+                            </div>
+                          </div>
                         </div>
                     </div>
                 </section>
