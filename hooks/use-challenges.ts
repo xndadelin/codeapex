@@ -11,6 +11,7 @@ interface Challenge_Line {
     tags: string[],
     is_public: boolean
     acceptance: number
+    submissions: number
 }
 
 interface Challenge {
@@ -29,6 +30,8 @@ interface Challenge {
     memory_limit: number,
     created_at: Date,
     updated_at: Date
+    acceptance: number,
+    submissions: number
 }
 
 export const challengeKeys = {
@@ -82,7 +85,20 @@ export function useListChallenges() {
         queryKey: challengeKeys.list(),
         queryFn: async() => {
             const supabase = createClient()
-            const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public")
+            const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions").eq("is_public", true)
+
+            if(error) throw error
+            return data as Challenge_Line[]
+        }
+    })
+}
+
+export function useListAdminChallenges() {
+    return useQuery<Challenge_Line[]>({
+        queryKey: challengeKeys.list(),
+        queryFn: async() => {
+            const supabase = createClient()
+            const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions")
 
             if(error) throw error
             return data as Challenge_Line[]
