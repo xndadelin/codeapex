@@ -1,6 +1,7 @@
 "use client"
 
 import { Navbar } from "@/components/navbar";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -163,8 +164,98 @@ export default function NewProblemPage() {
                                         </div>
 
                                         <Separator className="bg-border/30" />
+
+                                                                                <div className="flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <Label className="text-sm text-foreground">
+                                                Problem visibility
+                                            </Label>
+                                            <p className="text-[10px] text-muted-foreground">
+                                                Public problems are visible to all users on the platform.
+                                            </p>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <Badge
+                                                    variant={"outline"}
+                                                    className={`text-[10px] px-1.5 py-0 font-mono ${
+                                                        isPublic ? "border-emerald-500/40 text-emerald-400" : "border-amber-500/40 text-amber-400"
+                                                    }`}
+                                                >
+                                                    {isPublic ? "Public" : "Draft/Private"}
+                                                </Badge>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsPublic(!isPublic)}
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
+                                                        isPublic ? "bg-primary" : "bg-secondary"
+                                                    }`}
+                                                    role="switch"
+                                                    aria-checked={isPublic}
+                                                    aria-label="Make problem public"
+                                                >
+                                                    <span
+                                                        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-foreground shadow-lg transition-transform ${
+                                                            isPublic ? "translate-x-5" : "translate-x-0"
+                                                        }`}
+                                                    >
+                                                    </span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <Separator className="bg-border/30" />
+
+                                        <div className="grid gap-5 sm:grid-cols-2">
+                                            <div className="space-y-2">
+                                                <Label htmlFor="timeLimit" className="text-sm text-foreground">
+                                                    Time limit (ms)
+                                                </Label>
+                                                <Input
+                                                    id="timeLimit"
+                                                    type="number"
+                                                    value={timeLimit}
+                                                    onChange={(e) => setTimeLimit(Number(e.target.value))}
+                                                    placeholder="2000"
+                                                    className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
+                                                />
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    Default: 2000ms (2 seconds)
+                                                </p>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-sm text-foreground" htmlFor="memoryLimit">
+                                                    Memory limit (MB)
+                                                </Label>
+                                                <Input
+                                                    id="memoryLimit"
+                                                    type="number"
+                                                    value={memoryLimit}
+                                                    onChange={(e) => setMemoryLimit(Number(e.target.value))}
+                                                    placeholder="256"
+                                                    className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
+                                                />
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    Default: 256MB
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>                            
+                            </Card>
+
+                            <Card className="bg-card/50 border-border/50">
+                                <CardContent className="p-6">
+                                    <h2 className="text-lg font-semibold text-foreground mb-6">
+                                        Problem description
+                                    </h2>
+                                    <div className="space-y-5">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="description" className="text-sm text-foreground">
+                                                Description
+                                            </Label>
+                                        </div>
+                                    </div>
+                                </CardContent>                     
                             </Card>
                         </div>
                     </div>
