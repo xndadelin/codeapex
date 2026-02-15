@@ -6,17 +6,26 @@ import { Input } from "@/components/ui/input";
 import { Badge, Plus, Search, Shield } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import { useListAdminChallenges } from "@/hooks/use-challenges";
+import { usePaginatedChallenges } from "@/hooks/use-challenges";
 import Loading from "../loading";
 import { Badge as BadgeUI } from "@/components/ui/badge";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+
+const difficultyColors: Record<string, string> = {
+    "Easy": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
+    "Medium": "text-amber-400 border-amber-400/30 bg-amber-400/10",
+    "Hard": "text-red-400 border-red-400/30 bg-red-400/10"
+}
+
 
 export default function AdminDashboardPage() {
-    const { data: challenges, isLoading } = useListAdminChallenges()
     const [searchQuery, setSearchQuery] = useState<string>("")
-
-    if(isLoading) {
-        return <Loading />
-    }
+    const PAGE_SIZE = 1
+    const [page, setPage] = useState<number>(1)
+    const { data, isLoading } = usePaginatedChallenges(page - 1, PAGE_SIZE, "admin")
+    const challenges = data?.challenges ?? []
+    const count = data?.count ?? 0
+    const totalPages = Math.ceil(count / PAGE_SIZE)
 
     const filteredChallenges = challenges?.filter(challenge => challenge.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
@@ -88,7 +97,7 @@ export default function AdminDashboardPage() {
                                     {filteredChallenges?.map((problem, idx) => (
                                         <div
                                             key={problem.id}
-                                            className={`grid sm:grid-cols-[50px_1fr_90px_100px_90px_100px] gap-3 px-4 py-3 items-center hover:bg-primary/50 transition-colors ${
+                                            className={`grid sm:grid-cols-[50px_1fr_90px_100px_90px_100px] gap-3 px-4 py-3 items-center hover:bg-primary/10 transition-colors ${
                                                 idx < filteredChallenges.length - 1 ? "border-b border-border/30" : ""
                                             }`}
                                         >
@@ -106,13 +115,54 @@ export default function AdminDashboardPage() {
                                                 )}
                                             </div>
                                             <div className="hidden sm:block">
-                                                <BadgeUI variant={"outline"}>
+                                                <BadgeUI className={`text-9px font-mono ${difficultyColors[problem.difficulty]}`} variant={"outline"}>
                                                     {problem.difficulty}
                                                 </BadgeUI>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
+                                {totalPages > 1 && (
+                                    <div className="flex justify-center mt-6">
+                                        <Pagination>
+                                            <PaginationContent>
+                                                <PaginationItem>
+                                                    <PaginationPrevious
+                                                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                                                        className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                                                    />
+                                                </PaginationItem>
+
+                                                {Array.from({ length: totalPages}).map((_, idx) => (
+                                                    <PaginationItem key={idx}>
+                                                        <PaginationLink
+                                                            onClick={() => {
+                                                                setPage(idx + 1)
+                                                                window.scrollTo({
+                                                                    top: 0,
+                                                                    behavior: "smooth"
+                                                                })
+                                                            }}
+                                                            className={`h-8 w-8 rounded-md border border-border/50 bg-card text-sm text-foreground ${
+                                                                page === idx + 1 ? "bg-primary text-primary-foreground border-primary" : "hover:bg-primary/10"
+                                                            }`}
+                                                        >
+                                                            {idx + 1}
+                                                        </PaginationLink>
+                                                    </PaginationItem>
+                                                ))}
+
+                                                <PaginationItem>
+                                                    <PaginationNext
+                                                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                                        className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                                                    />
+                                                </PaginationItem>
+
+                                            </PaginationContent>
+                                        </Pagination>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

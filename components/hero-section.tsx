@@ -110,8 +110,8 @@ export function HeroSection() {
                         <div className="rounded-lg border border-border/60 bg-card overflow-hidden doom-border-glow">
                             <div className="flex items-center gap-2 px-4 py-3 bg-secondary/50 border-b border-border/50">
                                 <div className="flex gap-1.5">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
-                                    <div className="w-2.5 h-2.5 rounded-full bg-doom-lava/40" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/80" />
+                                    <div className="w-2.5 h-2.5 rounded-full bg-destructive/40" />
                                     <div className="w-2.5 h-2.5 rounded-full bg-muted-foreground/30" />
                                 </div>
                                 <span className="text-xs text-muted-foreground font-mono ml-2">

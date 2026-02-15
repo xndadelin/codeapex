@@ -34,10 +34,20 @@ interface Challenge {
     submissions: number
 }
 
+interface PaginatedChallenges {
+    challenges: Challenge_Line[],
+    count: number
+}
+
 export const challengeKeys = {
     all: ["challenges"] as const,
-    list: () => [...challengeKeys.all, "list"] as const,
-    detail: (id: UUID) => [...challengeKeys.all, "details", id] as const
+    lists: () => [...challengeKeys.all, "lists"] as const,
+    list: (filters?: { is_public?: boolean }) => [...challengeKeys.lists(), filters ?? {}] as const,
+    listLine: (scope: "public" | "admin") => [...challengeKeys.all, "list-line", scope] as const,
+    details: () => [...challengeKeys.all, "details"] as const,
+    detail: (id: UUID) => [...challengeKeys.details(), id] as const,
+    paginated: (page: number, pageSize: number, scope?: "public" | "admin") => 
+        [...challengeKeys.all, "paginated", { page, pageSize, scope }] as const 
 }
 
 export function useChallenges() {
@@ -69,7 +79,7 @@ export function useChallenge(id: UUID) {
 
 export function usePublicChallenges() {
     return useQuery<Challenge[]>({
-        queryKey: challengeKeys.list(),
+        queryKey: challengeKeys.list({ is_public: true }),
         queryFn: async() => {
             const supabase = createClient()
             const { data, error } = await supabase.from("challenges").select("*").eq("is_public", true)
@@ -82,7 +92,7 @@ export function usePublicChallenges() {
 
 export function useListChallenges() {
     return useQuery<Challenge_Line[]>({
-        queryKey: challengeKeys.list(),
+        queryKey: challengeKeys.listLine("public"),
         queryFn: async() => {
             const supabase = createClient()
             const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions").eq("is_public", true)
@@ -95,7 +105,7 @@ export function useListChallenges() {
 
 export function useListAdminChallenges() {
     return useQuery<Challenge_Line[]>({
-        queryKey: challengeKeys.list(),
+        queryKey: challengeKeys.listLine("admin"),
         queryFn: async() => {
             const supabase = createClient()
             const { data, error } = await supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions")
@@ -106,3 +116,31 @@ export function useListAdminChallenges() {
     })
 }
 
+export function usePaginatedChallenges(page: number, pageSize: number, scope: "public" | "admin" = "public") {
+    return useQuery<PaginatedChallenges>({
+        queryKey: challengeKeys.paginated(page, pageSize, scope),
+        queryFn: async() => {
+            const supabase = createClient()
+
+            const from = page * pageSize
+            const to = from + pageSize - 1
+
+            let query = supabase.from("challenges").select("id, title, difficulty, difficulty_points, category, tags, is_public, acceptance, submissions", {
+                count: "exact"
+            }).range(from, to)
+
+            if(scope === "public") {
+                query = query.eq("is_public", true)
+            }
+
+            const { data, error, count } = await
+                query
+        
+            if(error) throw error
+            return {
+                challenges: (data ?? []) as Challenge_Line[],
+                count: count ?? 0
+            }
+        },
+    })
+}
