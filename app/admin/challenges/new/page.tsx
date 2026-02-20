@@ -49,6 +49,9 @@ const formSchema = z.object({
     })
 })
 
+type FormData = z.infer<typeof formSchema>;
+
+
 const defaultTestCasesJson = JSON.stringify([
   { input: "2 7 11 15\n9", output: "0 1", is_sample: true },
   { input: "3 2 4\n6", output: "1 2", is_sample: true },
@@ -77,21 +80,30 @@ const topics = [
 ];
 
 export default function NewProblemPage() {
-    const [title, setTitle] = useState<string>("")
-    const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Easy")
-    const [category, setCategory] = useState<string>("")
-    const [tags, setTags] = useState<string>("")
-    const [description, setDescription] = useState<string>("")
-    const [constraints, setConstraints] = useState<string>("")
-    const [starterCode, setStarterCode] = useState<string>("def solution():\n    pass")
-    const [isPublic, setIsPublic] = useState<boolean>(false)
-    const [timeLimit, setTimeLimit] = useState<number>(1000)
-    const [memoryLimit, setMemoryLimit] = useState<number>(256)
-    const [testCasesJson, setTestCasesJson] = useState(defaultTestCasesJson)
+   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            title: "",
+            difficulty: "Easy",
+            category: topics[0],
+            tags: "",
+            description: "",
+            constraints: "",
+            starterCode: "def solution():\n  pass",
+            isPublic: false,
+            timeLimit: 2000,
+            memoryLimit: 256,
+            testCasesJson: defaultTestCasesJson
+        }
+   })
 
-    const validation = (() => {
+   const onSubmit = (data: FormData) => {
+        console.log(data)
+   }
+
+       const validation = (() => {
         try {
-            const parsed = JSON.parse(testCasesJson)
+            const parsed = JSON.parse(watch("testCasesJson"))
             if(!Array.isArray(parsed)) return {
                 valid: false,
                 count: 0,
@@ -158,8 +170,7 @@ export default function NewProblemPage() {
                                             </Label>
                                             <Input
                                                 id="title"
-                                                value={title}
-                                                onChange={(e) => setTitle(e.target.value)}
+                                                {...register("title")}
                                                 placeholder="e.g., Two Sum"
                                                 className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
                                             />
@@ -175,9 +186,9 @@ export default function NewProblemPage() {
                                                         <button
                                                             key={d}
                                                             type="button"
-                                                            onClick={() => setDifficulty(d)}
+                                                            onClick={() => setValue("difficulty", d)}
                                                             className={`flex-1 px-3 py-2 rounded-md text-xs font-mono transition-colors border ${
-                                                                difficulty === d ? difficultyColors[d] : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground"
+                                                                watch("difficulty") === d ? difficultyColors[d] : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground"
                                                             }`}
                                                         >
                                                             {d}
@@ -191,8 +202,8 @@ export default function NewProblemPage() {
                                                 </Label>
                                                 <select
                                                     id="category"
-                                                    value={category}
-                                                    onChange={(e) => setCategory(e.target.value)}
+                                                    {...register("category")}
+                                                    onChange={(e) => setValue("category", e.target.value)}
                                                     className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                                                 >
                                                     {topics.map((_topic) => (
@@ -208,8 +219,7 @@ export default function NewProblemPage() {
                                                 </Label>
                                                 <Input
                                                     id="tags"
-                                                    value={tags}
-                                                    onChange={(e) => setTags(e.target.value)}
+                                                    {...register("tags")}
                                                     className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
                                                     placeholder="e.g., array, hash-table"
                                                 />
@@ -234,24 +244,24 @@ export default function NewProblemPage() {
                                                 <Badge
                                                     variant={"outline"}
                                                     className={`text-[10px] px-1.5 py-0 font-mono ${
-                                                        isPublic ? "border-emerald-500/40 text-emerald-400" : "border-amber-500/40 text-amber-400"
+                                                        watch("isPublic") ? "border-emerald-500/40 text-emerald-400" : "border-amber-500/40 text-amber-400"
                                                     }`}
                                                 >
-                                                    {isPublic ? "Public" : "Draft/Private"}
+                                                    {watch("isPublic") ? "Public" : "Draft/Private"}
                                                 </Badge>
                                                 <button
                                                     type="button"
-                                                    onClick={() => setIsPublic(!isPublic)}
+                                                    onClick={() => setValue("isPublic", !watch("isPublic"))}
                                                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${
-                                                        isPublic ? "bg-primary" : "bg-secondary"
+                                                        watch("isPublic") ? "bg-primary" : "bg-secondary"
                                                     }`}
                                                     role="switch"
-                                                    aria-checked={isPublic}
+                                                    aria-checked={watch("isPublic")}
                                                     aria-label="Make problem public"
                                                 >
                                                     <span
                                                         className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-foreground shadow-lg transition-transform ${
-                                                            isPublic ? "translate-x-5" : "translate-x-0"
+                                                            watch("isPublic") ? "translate-x-5" : "translate-x-0"
                                                         }`}
                                                     >
                                                     </span>
@@ -269,8 +279,9 @@ export default function NewProblemPage() {
                                                 <Input
                                                     id="timeLimit"
                                                     type="number"
-                                                    value={timeLimit}
-                                                    onChange={(e) => setTimeLimit(Number(e.target.value))}
+                                                    {...register("timeLimit", {
+                                                        valueAsNumber: true
+                                                    })}
                                                     placeholder="2000"
                                                     className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
                                                 />
@@ -285,8 +296,9 @@ export default function NewProblemPage() {
                                                 <Input
                                                     id="memoryLimit"
                                                     type="number"
-                                                    value={memoryLimit}
-                                                    onChange={(e) => setMemoryLimit(Number(e.target.value))}
+                                                    {...register("memoryLimit", {
+                                                        valueAsNumber: true
+                                                    })}
                                                     placeholder="256"
                                                     className="bg-secondary/30 border-border/50 text-foreground font-mono text-sm focus-visible:ring-primary/50"
                                                 />
@@ -310,8 +322,7 @@ export default function NewProblemPage() {
                                             </Label>
                                             <textarea
                                                 id="description"
-                                                value={description}
-                                                onChange={(e) => setDescription(e.target.value)}
+                                                {...register("description")}
                                                 placeholder="Describe the problem statement in details. Use Markdown formatting."
                                                 rows={8}
                                                 className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
@@ -323,8 +334,7 @@ export default function NewProblemPage() {
                                             </Label>
                                             <textarea
                                                 id="constraints"
-                                                value={constraints}
-                                                onChange={(e) => setConstraints(e.target.value)}
+                                                {...register("constraints")}
                                                 placeholder={`One constraint per line, eg: \n2 <= nums.length <= 10^4\n-10^9 <= nums[i] <= 10^9
                                                 `}
                                                 rows={4}
@@ -344,8 +354,7 @@ export default function NewProblemPage() {
                                         </h2>
                                     </div>
                                     <textarea
-                                        value={starterCode}
-                                        onChange={(e) => setStarterCode(e.target.value)}
+                                        {...register("starterCode")}
                                         rows={10}
                                         className="w-full rounded-md bg-secondary/30 border border-border/50 text-foreground font-mono text-sm p-4 resize-none outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-0 leading-relaxed"
                                         spellCheck={false}
@@ -359,7 +368,7 @@ export default function NewProblemPage() {
                                             Test cases (JSON format)
                                         </h2>
                                         <div className="flex items-center gap-2">
-                                            {testCasesJson.trim() && (
+                                            {watch("testCasesJson").trim() && (
                                                 <Badge
                                                     variant={"outline"}
                                                     className={`text-[10px] px-1.5 py-0 font-mono ${validation().valid ? "border-emerald-500/40 text-emerald-400" : "border-red-500/40 text-red-400"}`}
@@ -381,12 +390,11 @@ export default function NewProblemPage() {
                                         </p>
                                     )}
                                     <textarea
-                                        value={testCasesJson}
-                                        onChange={(e) => setTestCasesJson(e.target.value)}
+                                        {...register("testCasesJson")}
                                         rows={20}
                                         spellCheck={false}
                                         className={`w-full rounded-md bg-secondary/30 border text-foreground font-mono text-xs p-4 resize-y outline-none focus-visible:ring-2 focus-visible:ring-offset-0 leading-relaxed ${
-                                            validation().valid || !testCasesJson.trim() ? "border-border/50 focus-visible:ring-primary/50" : "border-red-500/30 focus-visible:ring-red-500/50"
+                                            validation().valid || !watch("testCasesJson").trim() ? "border-border/50 focus-visible:ring-primary/50" : "border-red-500/30 focus-visible:ring-red-500/50"
                                         }`}
                                     />
                                 </CardContent>
