@@ -10,6 +10,44 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Eye, FileCode, FileCode2, Save, Shield } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const testCaseSchema = z.object({
+    input: z.string(),
+    output: z.string(),
+    is_sample: z.boolean()
+})
+
+const formSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    difficulty: z.enum(["Easy", "Medium", "Hard"]),
+    category: z.string().min(1, "Category is required"),
+    tags: z.string(),
+    description: z.string().optional(),
+    constraints: z.string().optional(),
+    starterCode: z.string().optional(),
+    isPublic: z.boolean(),
+    timeLimit: z.number().min(1, "Time limit must be at least 1ms"),
+    memoryLimit: z.number().min(1, "Memory limit must be at least 1MB"),
+    testCasesJson: z.string().refine((val) => {
+        try {
+            const parsed = JSON.parse(val)
+            return Array.isArray(parsed) && parsed.every((test) =>
+                typeof test === "object" &&
+                test !== null &&
+                "input" in test && typeof test.input === "string" &&
+                "output" in test && typeof test.output === "string" &&
+                "is_sample" in test && typeof test.is_sample === "boolean"
+            )
+        } catch {
+            return false
+        }
+    }, {
+        message: "Invalid test cases JSON. Must be an array of objects with 'input' (string), 'output' (string) and 'is_sample' (boolean) keys."
+    })
+})
 
 const defaultTestCasesJson = JSON.stringify([
   { input: "2 7 11 15\n9", output: "0 1", is_sample: true },
