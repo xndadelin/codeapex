@@ -63,7 +63,6 @@ export default function SignupPage() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full bg-primary/5 blur-[120px]" />
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
@@ -101,7 +100,7 @@ export default function SignupPage() {
           </p>
         </div>
       </div>
-      <Card className="bg-card/50 border-border/50 doom-border-glow w-full max-w-md">
+      <Card className="bg-card/50 border-border/50 w-full max-w-md">
         <CardContent className="p-6">
           {signupMutation.isError && (
             <div className="mb-4 p-4 rounded-md bg-destructive/10 border border-destructive/20">
@@ -209,7 +208,7 @@ export default function SignupPage() {
             <Button
                 type="submit"
                 disabled={true}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11 doom-glow"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11"
             >
                 {signupMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin " />

@@ -34,7 +34,6 @@ export function HeroSection() {
             className="relative overflow-hidden"
         >
             <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] rounded-full bg-primary/5 blur-[120px]" />
                 <div 
                     className="absolute inset-0 opacity-[0.03]"
                     style={{
