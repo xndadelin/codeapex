@@ -7,21 +7,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Eye, FileCode, FileCode2, Save, Shield } from "lucide-react";
+import { ArrowLeft, Eye, FileCode2, Save, Shield } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useUser } from "@/hooks/use-auth";
-import Loading from "@/app/loading";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useRouter } from "next/navigation";
 
-const testCaseSchema = z.object({
-    input: z.string(),
-    output: z.string(),
-    is_sample: z.boolean()
-})
 
 const formSchema = z.object({
     title: z.string().min(1, "Title is required"),
@@ -83,7 +77,9 @@ const topics = [
 ];
 
 export default function NewProblemPage() {
+const router = useRouter()
    const { isAdmin } = useAuthStore()
+   const [loading, setLoading] = useState(false)
    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -101,8 +97,28 @@ export default function NewProblemPage() {
         }
    })
 
-   const onSubmit = (data: FormData) => {
-        console.log(data)
+   const onSubmit = async(data: FormData) => {
+        setLoading(true)
+        const response = await fetch("/api/admin/challenges/new", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data)
+        }) 
+
+        const Data = await response.json()
+        if(Data?.error) {
+            if(JSON.stringify(errors) !== "{}") {
+                alert(JSON.stringify(Data.error))
+            }
+        }
+        if(response.ok) {
+            const { id } = Data
+            router.push(`/challenges/${id}`) 
+        }
+
+        setLoading(false)
    }
 
     const validation = (() => {
@@ -424,7 +440,7 @@ export default function NewProblemPage() {
                                     <Eye className="w-4 h-4" />
                                     Save as draft
                                 </Button>
-                                <Button className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 gap-2">
+                                <Button disabled={loading} onClick={handleSubmit(onSubmit)} className="bg-primary cursor-pointer text-primary-foreground hover:bg-primary/90 gap-2">
                                     <Save className="w-4 h-4" />
                                     Publish challenge
                                 </Button>
