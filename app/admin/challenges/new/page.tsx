@@ -15,6 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useUser } from "@/hooks/use-auth";
 import Loading from "@/app/loading";
+import { useAuthStore } from "@/hooks/useAuthStore";
 
 const testCaseSchema = z.object({
     input: z.string(),
@@ -82,7 +83,7 @@ const topics = [
 ];
 
 export default function NewProblemPage() {
-   const { data: user, isLoading } = useUser() 
+   const { isAdmin } = useAuthStore()
    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -104,7 +105,7 @@ export default function NewProblemPage() {
         console.log(data)
    }
 
-       const validation = (() => {
+    const validation = (() => {
         try {
             const parsed = JSON.parse(watch("testCasesJson"))
             if(!Array.isArray(parsed)) return {
@@ -137,8 +138,12 @@ export default function NewProblemPage() {
         }
     })
 
-    if(isLoading) {
-        return <Loading />
+    if(!isAdmin) {
+        return (
+            <div>
+                Holdup, you are not an admin!
+            </div>
+        )
     }
 
 

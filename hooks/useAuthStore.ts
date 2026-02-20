@@ -15,8 +15,8 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             isAuthenticated: false,
             isAdmin: false,
-            setUser: (user) => set({
-                user, isAuthenticated: !!user, isAdmin: false
+            setUser: (user, isAdmin) => set({
+                user, isAuthenticated: !!user, isAdmin
             })
         }),
         {

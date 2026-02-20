@@ -37,13 +37,15 @@ export function useUser() {
             if(error) throw error
             let isAdmin = false
             if(user) {
-                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", user.id).single()
-
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("user_id").eq("user_id", user.id.replace(/"/g, "")).maybeSingle()
                 isAdmin = !!adminData
             }
 
             setUser(user, isAdmin)
-
+            return {
+                user,
+                isAdmin
+            }
         },
         staleTime: 5 * 60 * 1000,
         retry: false
@@ -71,7 +73,7 @@ export function useSignup() {
             let isAdmin = false
             const supabase = createClient()
             if(data.user) {
-                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id).single()
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id.replace(/"/g, "")).single()
 
                 isAdmin = !!adminData
             }
@@ -106,7 +108,7 @@ export function useLogin() {
             let isAdmin = false
             const supabase = createClient()
             if(data.user) {
-                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id).single()
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id.replace(/"/g, "") ).single()
 
                 isAdmin = !!adminData
             }
