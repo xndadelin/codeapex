@@ -5,7 +5,8 @@ import { persist } from "zustand/middleware"
 interface AuthState {
     user: User | null,
     isAuthenticated: boolean
-    setUser: (user: User | null) => void
+    isAdmin?: boolean
+    setUser: (user: User | null, isAdmin: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -13,15 +14,17 @@ export const useAuthStore = create<AuthState>()(
         (set) => ({
             user: null,
             isAuthenticated: false,
+            isAdmin: false,
             setUser: (user) => set({
-                user, isAuthenticated: !!user
+                user, isAuthenticated: !!user, isAdmin: false
             })
         }),
         {
             name: "auth-storage",
             partialize: (state) => ({
                 user: state.user ?? null,
-                isAuthenticated: state.isAuthenticated
+                isAuthenticated: state.isAuthenticated,
+                isAdmin: state.isAdmin
             })
         }
     )

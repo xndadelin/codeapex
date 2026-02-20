@@ -32,10 +32,18 @@ export function useUser() {
         queryFn: async() => {
             const supabase = createClient()
             const { data: { user }, error } = await supabase.auth.getUser()
-
+            
+        
             if(error) throw error
-            setUser(user)
-            return user
+            let isAdmin = false
+            if(user) {
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", user.id).single()
+
+                isAdmin = !!adminData
+            }
+
+            setUser(user, isAdmin)
+
         },
         staleTime: 5 * 60 * 1000,
         retry: false
@@ -59,12 +67,20 @@ export function useSignup() {
 
             return data
         },
-        onSuccess: (data) => {
-            console.log(data)
-            setUser(data.user)
+        onSuccess: async(data) => {
+            let isAdmin = false
+            const supabase = createClient()
+            if(data.user) {
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id).single()
+
+                isAdmin = !!adminData
+            }
+
+            setUser(data.user, isAdmin)
             queryClient.invalidateQueries({
                 queryKey: authKeys.all
             })
+            router.push("/")
         }
     })
 }
@@ -86,8 +102,16 @@ export function useLogin() {
             if(error) throw error
             return data
         },
-        onSuccess: (data) => {
-            setUser(data.user)
+        onSuccess: async(data) => {
+            let isAdmin = false
+            const supabase = createClient()
+            if(data.user) {
+                const { data: adminData, error: adminError } = await supabase.from("admins").select("id").eq("user_id", data.user.id).single()
+
+                isAdmin = !!adminData
+            }
+
+            setUser(data.user, isAdmin)
             queryClient.invalidateQueries({
                 queryKey: authKeys.all
             })

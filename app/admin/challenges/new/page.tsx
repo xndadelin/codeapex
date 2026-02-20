@@ -13,6 +13,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useUser } from "@/hooks/use-auth";
+import Loading from "@/app/loading";
 
 const testCaseSchema = z.object({
     input: z.string(),
@@ -80,6 +82,7 @@ const topics = [
 ];
 
 export default function NewProblemPage() {
+   const { data: user, isLoading } = useUser() 
    const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -133,6 +136,11 @@ export default function NewProblemPage() {
             }
         }
     })
+
+    if(isLoading) {
+        return <Loading />
+    }
+
 
     return (
         <div className="flex min-h-screen flex-col">
