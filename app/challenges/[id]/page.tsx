@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 const difficultyColors: Record<string, string> = {
     "Easy": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
@@ -111,9 +113,12 @@ export default function ChallengePage() {
                                             </Badge>
                                         ))}
                                     </div>
-                                    <p className="text-sm text-foreground leading-relaxed mb-8">
-                                        {challenge.description}
-                                    </p>
+                                    
+                                    <div className="prose prose-invert max-w-none mb-8">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {challenge.description}
+                                        </ReactMarkdown>
+                                    </div>
 
                                     <div className="space-y-6">
                                         {challenge.test_cases?.map((testCase, index) => (
@@ -149,13 +154,14 @@ export default function ChallengePage() {
                                         <h3 className="text-sm font-semibold text-foreground mb-3">
                                             Constraints
                                         </h3>
-                                        <code className="bg-transparent text-foreground p-4 rounded-md text-sm font-mono">
-                                            - {challenge.constraints}
-                                        </code>
+                                         <div className="prose prose-invert max-w-none mb-8">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                {challenge.constraints}
+                                            </ReactMarkdown>
+                                        </div>
                                     </div>
                                 </TabsContent>
                             </div>
-
                         </Tabs>
                     </Tabs>
                 </div>
