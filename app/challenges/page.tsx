@@ -1,13 +1,17 @@
+"use client";
+
 import { useListChallenges } from "@/hooks/use-challenges";
 import { UUID } from "crypto";
 import Loading from "../loading";
 import { Navbar } from "@/components/navbar";
 import { Card, CardContent } from "@/components/ui/card";
-import { useMemo, useState } from "react";
-import { Search } from "lucide-react";
+import { Fragment, useMemo, useState } from "react";
+import { Search, Tag } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
 interface Challenge_Line {
     id: UUID,
@@ -43,42 +47,36 @@ const difficultyColors: Record<string, string> = {
     "Hard": "text-red-400 border-red-400/30 bg-red-400/10"
 }
 
-export function Challenges() {
+export default function Challenges() {
     const { data: challenges, isLoading, error } = useListChallenges()
     const [difficultyFilter, setDifficultyFilter] = useState<Difficulty>("all")
     const [categoryFilter, setCategoryFilter] = useState<string>("all")
     const [searchQuery, setSearchQuery] = useState<string>("")
+
+    const filtered = useMemo(() => {
+    if (!challenges) return []
+
+    return challenges.filter(c => 
+        (difficultyFilter === "all" || c.difficulty === difficultyFilter) &&
+        (categoryFilter === "all" || c.category === categoryFilter) &&
+        (!searchQuery.trim() || 
+            c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            c.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            c.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+        )
+    )
+    }, [challenges, difficultyFilter, categoryFilter, searchQuery])
 
     if(isLoading) {
         return <Loading />
     }
 
     const difficultyLength: Record<string, number> = {
+        "Total": challenges?.length || 0,
         "Easy": challenges?.filter((challenge: Challenge_Line) => challenge.difficulty === "Easy").length || 0,
         "Medium": challenges?.filter((challenge: Challenge_Line) => challenge.difficulty === "Medium").length || 0,
         "Hard": challenges?.filter((challenge: Challenge_Line) => challenge.difficulty === "Hard").length || 0
     }
-
-    const filtered = useMemo(() => {
-        let result = [...(challenges ?? [])] as Challenge_Line[]
-
-        if(difficultyFilter !== "all") {
-            result = result.filter(challenge => challenge.difficulty === difficultyFilter)
-        }
-
-        if(categoryFilter !== "all") {
-            result = result.filter(challenge => challenge.category === categoryFilter)
-        }
-
-        if(searchQuery.trim()) {
-            const query = searchQuery.toLowerCase()
-            result = result.filter(challenge => challenge.title.toLowerCase().includes(query) ||
-            challenge.category.toLowerCase().includes(query) ||
-            challenge.tags.some(tag => tag.toLowerCase().includes(query))
-          )
-        }
-
-    }, [difficultyFilter, categoryFilter, searchQuery])
 
     return (
         <div className="flex min-h-screen flex-col">
@@ -101,7 +99,7 @@ export function Challenges() {
                             {difficultyLength && Object.entries(difficultyLength).map(([difficulty, count]) => (
                                 <Card key={difficulty} className="bg-card/50 border-border/50">
                                     <CardContent className="p-4 flex flex-col items-center">
-                                        <span className={`text-2xl font-bold font-mono ${difficultyColors[difficulty]}`}>
+                                        <span className={`text-2xl font-bold font-mono ${difficultyColors[difficulty]} bg-transparent`}>
                                             {count}
                                         </span>
                                         <span className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
@@ -145,7 +143,13 @@ export function Challenges() {
                                 <button
                                     key={topic}
                                     type="button"
-                                    onClick={() => setCategoryFilter(topic)}
+                                    onClick={() => {
+                                        if(categoryFilter === topic) {
+                                            setCategoryFilter("all")
+                                        } else {
+                                            setCategoryFilter(topic)
+                                        }
+                                    }}
                                     className={`px-3 py-1.5 rounded-md text-xs font-mono transition-colors border ${
                                         categoryFilter === topic ? "bg-primary/15 border-primary/40 text-primary" : "bg-secondary/30 border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30"
                                     }`}
@@ -153,6 +157,68 @@ export function Challenges() {
                                     {topic}
                                 </button>
                             ))}
+                        </div>
+
+                        <div className="rounded-lg border border-border/60 overflow-hidden bg-card/30">
+                            <div className="hidden sm:grid grid-cols-[40px_1fr_100px_130px_90px] gap-4 px-5 py-3 bg-secondary/30 border-b border-border/50">
+                                <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider" />
+                                 <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
+                                    Challenge
+                                 </span>
+                                <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
+                                    Difficulty
+                                 </span>
+                                <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider">
+                                    Category
+                                 </span>
+                                <span className="text-xs text-muted-foreground font-mono uppercase tracking-wider text-right">
+                                    Accept.
+                                 </span>
+                            </div>
+
+                            {!isLoading && challenges && filtered.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-16">
+                                    <Tag className="w-8 h-8 text-muted-foreground/40 mb-3" />
+                                    <p className="text-sm text-muted-foreground">
+                                        No challenges match your filters.
+                                    </p>
+                                    <Button
+                                        variant={"ghost"}
+                                        size="sm"
+                                        onClick={() => {
+                                            setDifficultyFilter("all"); setCategoryFilter("all")
+                                        }}
+                                        className="mt-3 text-primary text-xs"
+                                    >
+                                        Clear filters
+                                    </Button>
+                                </div>
+                            ): filtered.map((challenge, idx) => (
+                                <Fragment key={challenge.id}>
+                                    <Link
+                                    href={`/challenges/${challenge.id}`}
+                                    className={`group grid sm:grid-cols-[40px_1fr_100px_130px_90px] gap-4 px-5 py-3.5 items-center transition-colors hover:bg-secondary/30 ${
+                                        idx < filtered.length - 1 ? "border-b border-border/30" : ""
+                                    }`}
+                                    >
+                                        <span className="text-xs font-mono text-muted-foreground">{idx + 1}</span>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                            <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors whitespace-nowrap overflow-hidden text-ellipsis">
+                                            {challenge.title}
+                                            </span>
+                                            <Badge variant="outline" className={`sm:hidden text-[9px] font-mono ${difficultyColors[challenge.difficulty]}`}>
+                                            {challenge.difficulty}
+                                            </Badge>
+                                        </div>
+                                        <Badge variant="outline" className={`hidden sm:inline text-[10px] font-mono ${difficultyColors[challenge.difficulty]}`}>
+                                            {challenge.difficulty}
+                                        </Badge>
+                                        <span className="text-sm font-mono text-muted-foreground">{challenge.category}</span>
+                                        <span className="text-sm font-mono text-right text-muted-foreground">{challenge.acceptance}%</span>
+                                    </Link>
+                                </Fragment>
+                            ))}
+
                         </div>
                     </div>
                 </section>
