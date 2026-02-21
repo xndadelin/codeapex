@@ -130,8 +130,8 @@ export default function AdminDashboardPage() {
                                                         <span className="sr-only">View</span>
                                                     </Link>
                                                 </Button>
-                                                <Button variant={"ghost"} size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-primary" asChild>
-                                                    <Link href={`/admin/challenges/${problem.id}/edit`}>
+                                                <Button variant={"ghost"} size="sm" className="h-7 cursor-pointer w-7 p-0 text-muted-foreground hover:text-primary">
+                                                    <Link href={`/admin/challenges/edit/${problem.id}`}>
                                                         <Edit3 className="w-3.5 h-3.5" />
                                                         <span className="sr-only">
                                                             Edit

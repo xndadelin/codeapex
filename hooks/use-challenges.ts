@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/client";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { UUID } from "crypto";
 
 interface Challenge_Line {
@@ -11,6 +11,14 @@ interface Challenge_Line {
     is_public: boolean
     acceptance: number
     submissions: number
+}
+
+interface TestCase {
+    id: UUID,
+    challenge_id: UUID,
+    input: string,
+    output: string,
+    is_sample: boolean
 }
 
 interface Challenge {
@@ -29,7 +37,8 @@ interface Challenge {
     created_at: Date,
     updated_at: Date
     acceptance: number,
-    submissions: number
+    submissions: number,
+    test_cases?: TestCase[]
 }
 
 interface PaginatedChallenges {
@@ -62,15 +71,19 @@ export function useChallenges() {
     })
 }
 
-export function useChallenge(id: UUID) {
+export function useChallengeAdmin(id: UUID) {
     return useQuery<Challenge>({
         queryKey: challengeKeys.detail(id),
         queryFn: async() => {
             const supabase = createClient()
             const { data, error } = await supabase.from("challenges").select("*").eq("id", id).single()
+            const { data: testCases, error: testCasesError } = await supabase.from("test_cases").select("*").eq("challenge_id", id)
 
-            if(error) throw error
-            return data as Challenge
+            if(error || testCasesError) throw error
+            return {
+                ...data as Challenge,
+                test_cases: testCases
+            }
         }
     })
 }
