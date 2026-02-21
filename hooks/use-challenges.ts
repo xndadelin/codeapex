@@ -57,6 +57,21 @@ export const challengeKeys = {
         [...challengeKeys.all, "paginated", { page, pageSize, scope, searchQuery}] as const 
 }
 
+export function useChallenge(id: UUID) {
+    return useQuery<Challenge>({
+        queryKey: challengeKeys.detail(id),
+        queryFn: async() => {
+            const supabase = createClient()
+            const {
+                data, error
+            } = await supabase.from("challenges").select("*").eq("id", id).single()
+
+            if(error) throw error
+            return data as Challenge
+        }
+    })
+}
+
 export function useChallenges() {
     return useQuery<Challenge[]>({
         queryKey: challengeKeys.list(),
