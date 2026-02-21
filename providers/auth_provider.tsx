@@ -2,10 +2,7 @@
 
 import { useAuthStore } from "@/hooks/useAuthStore"
 import { createClient } from "@/utils/supabase/client"
-import { useQueryClient } from "@tanstack/react-query"
 import { useEffect } from "react"
-import { authKeys } from "@/hooks/use-auth"
-
 
 export function AuthProvider({
     children
@@ -13,30 +10,38 @@ export function AuthProvider({
     children: React.ReactNode
 }) {
     const { setUser } = useAuthStore()
-    const queryClient = useQueryClient()
 
     useEffect(() => {
         const supabase = createClient()
-        supabase.auth.getSession().then(({
-            data: { session }
-        }) => {
-            setUser(session?.user ?? null)
+
+        const handleUser = async (user: any) => {
+            if (!user) {
+                setUser(null, false)
+                return
+            }
+
+            const { data } = await supabase
+                .from("admins")
+                .select("id")
+                .eq("user_id", user.id)
+                .maybeSingle()
+
+            setUser(user, !!data)
+        }
+
+        supabase.auth.getSession().then(({ data }) => {
+            handleUser(data.session?.user ?? null)
         })
 
-        const {
-            data: {
-                subscription
-            },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null)
-            queryClient.invalidateQueries({
-                queryKey: authKeys.all
+        const { data: { subscription } } =
+            supabase.auth.onAuthStateChange((_event, session) => {
+                handleUser(session?.user ?? null)
             })
-        })
 
-        return () => subscription.unsubscribe()
-        
-    }, [setUser, queryClient])
+        return () => {
+            subscription.unsubscribe()
+        }
+    }, [setUser])
 
     return <>{children}</>
 }

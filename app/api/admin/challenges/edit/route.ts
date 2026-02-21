@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
           category: parsedData.category,
           tags: parsedData.tags.split(",").map(tag => tag.trim()),
           description: parsedData.description,
-          constraints: parsedData.constraints,
+          constraints: parsedData.constraints,  
           starter_code: parsedData.starterCode,
           is_public: parsedData.isPublic,
           time_limit: parsedData.timeLimit,
