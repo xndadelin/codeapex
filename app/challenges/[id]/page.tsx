@@ -114,8 +114,8 @@ export default function ChallengePage() {
                                         ))}
                                     </div>
                                     
-                                    <div className="prose prose-invert max-w-none mb-8">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    <div className="font-mono prose prose-invert max-w-none text-sm mb-8">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]} skipHtml={false}>
                                             {challenge.description}
                                         </ReactMarkdown>
                                     </div>
@@ -154,7 +154,7 @@ export default function ChallengePage() {
                                         <h3 className="text-sm font-semibold text-foreground mb-3">
                                             Constraints
                                         </h3>
-                                         <div className="prose prose-invert max-w-none mb-8">
+                                         <div className="max-w-none mb-8 font-mono">
                                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                                 {challenge.constraints}
                                             </ReactMarkdown>
