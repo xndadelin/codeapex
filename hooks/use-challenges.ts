@@ -64,7 +64,7 @@ export function useChallenge(id: UUID) {
             const supabase = createClient()
             const {
                 data, error
-            } = await supabase.from("challenges").select("*").eq("id", id).single()
+            } = await supabase.from("challenges").select("*").eq("id", id).eq("is_public", true).single()
 
             if(error) throw error
             return data as Challenge
