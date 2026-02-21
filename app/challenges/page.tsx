@@ -12,6 +12,14 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationItem,
+    PaginationPrevious,
+    PaginationNext,
+    PaginationLink
+} from "@/components/ui/pagination"
 
 interface Challenge_Line {
     id: UUID,
@@ -53,10 +61,20 @@ export default function Challenges() {
     const [categoryFilter, setCategoryFilter] = useState<string>("all")
     const [searchQuery, setSearchQuery] = useState<string>("")
 
-    const filtered = useMemo(() => {
-    if (!challenges) return []
+    const [page, setPage] = useState<number>(1)
+    const pageSize = 10
+    const totalPages = challenges ? Math.ceil(challenges.length / pageSize) : 1
 
-    return challenges.filter(c => 
+    const currentPageChallenges = useMemo(() => {
+        if(!challenges) return []
+        const startindex = (page - 1) * pageSize
+        return challenges.slice(startindex, startindex + pageSize)
+    }, [challenges, page])
+
+    const filtered = useMemo(() => {
+    if (!currentPageChallenges) return []
+
+    return currentPageChallenges.filter(c => 
         (difficultyFilter === "all" || c.difficulty === difficultyFilter) &&
         (categoryFilter === "all" || c.category === categoryFilter) &&
         (!searchQuery.trim() || 
@@ -65,7 +83,7 @@ export default function Challenges() {
             c.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
         )
     )
-    }, [challenges, difficultyFilter, categoryFilter, searchQuery])
+    }, [challenges, difficultyFilter, categoryFilter, searchQuery, currentPageChallenges])
 
     if(isLoading) {
         return <Loading />
@@ -218,9 +236,49 @@ export default function Challenges() {
                                     </Link>
                                 </Fragment>
                             ))}
-
                         </div>
                     </div>
+                    {totalPages > 1 && (
+                        <div className="flex justify-center mt-6">
+                            <Pagination>
+                                <PaginationContent>
+                                    <PaginationItem>
+                                        <PaginationPrevious
+                                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                                            className={page === 1 ? "pointer-events-none opacity-50" : ""}
+                                        />
+                                    </PaginationItem>
+
+                                    {Array.from({ length: totalPages}).map((_, idx) => (
+                                        <PaginationItem key={idx}>
+                                            <PaginationLink
+                                                onClick={() => {
+                                                    setPage(idx + 1)
+                                                    window.scrollTo({
+                                                        top: 0,
+                                                        behavior: "smooth"
+                                                    })
+                                                }}
+                                                className={`h-8 w-8 rounded-md border border-border/50 bg-card text-sm text-foreground ${
+                                                    page === idx + 1 ? "bg-primary text-primary-foreground border-primary" : "hover:bg-primary/10"
+                                                }`}
+                                            >
+                                                {idx + 1}
+                                            </PaginationLink>
+                                        </PaginationItem>
+                                    ))}
+
+                                    <PaginationItem>
+                                        <PaginationNext
+                                            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                            className={page >= totalPages ? "pointer-events-none opacity-50" : ""}
+                                        />
+                                    </PaginationItem>
+
+                                </PaginationContent>
+                            </Pagination>
+                        </div>
+                    )}
                 </section>
             </main>
         </div>
