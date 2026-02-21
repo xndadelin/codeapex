@@ -66,8 +66,14 @@ export function useChallenge(id: UUID) {
                 data, error
             } = await supabase.from("challenges").select("*").eq("id", id).eq("is_public", true).single()
 
-            if(error) throw error
-            return data as Challenge
+            if(!data) throw new Error("Challenge not found!")  
+            const { data: testCases_sample, error: testcaseserror} = await supabase.from("test_cases").select("*").eq("challenge_id", id).eq("is_sample", true)
+
+            if(error || testcaseserror) throw error
+            return {
+                ...data as Challenge, 
+                test_cases: testCases_sample
+            }
         }
     })
 }
