@@ -3,7 +3,7 @@
 import Loading from "@/app/loading";
 import { useChallenge } from "@/hooks/use-challenges";
 import { UUID } from "crypto";
-import { ArrowLeft, BookOpen, Lightbulb, Play, Send, Terminal } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronDown, Lightbulb, Play, Send, Terminal } from "lucide-react";
 import Error from "next/error";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -14,6 +14,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { Card, CardContent } from "@/components/ui/card";
+
+// to do add hints dont forget, for now its hardcoded lmao
 
 const difficultyColors: Record<string, string> = {
     "Easy": "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
@@ -21,11 +24,17 @@ const difficultyColors: Record<string, string> = {
     "Hard": "text-red-400 border-red-400/30 bg-red-400/10"
 }
 
+const possibleLanguages = [
+    'Python 3',
+    'C/C++'
+]
 
 export default function ChallengePage() {
     const { id } = useParams()
     const { data: challenge, isLoading } = useChallenge(id as UUID)
     const [activeTab, setActiveTab] = useState("description")
+    const [language, setLanguage] = useState("Python 3")
+    const [code, setCode] = useState("")
 
     if(isLoading) {
         return <Loading />
@@ -82,7 +91,6 @@ export default function ChallengePage() {
 
             <div className="flex-1 grid lg:grid-cols-2 divide-x divide-border/40">
                 <div className="flex flex-col overflow-hidden">
-                    <Tabs className="bg-transparent h-10 p-0 gap-0">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1">
                             <div className="border-b border-border/40">
                                 <TabsList className="bg-transparent h-10 gap-0 p-0">
@@ -161,9 +169,84 @@ export default function ChallengePage() {
                                         </div>
                                     </div>
                                 </TabsContent>
+
+                               <TabsContent value="hints" className="p-6 m-0">
+                                    <div className="space-y-4">
+                                        <Card className="bg-card/50 border-border/40">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Lightbulb className="w-3.5 h-3.5" />
+                                                    <span className="text-sm font-semibold text-foreground">
+                                                        Hint 1
+                                                    </span>
+                                                </div>
+                                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                                        idk man just do it
+                                                    </p>
+                                            </CardContent>
+                                        </Card>
+                                        <Card className="bg-card/50 border-border/40">
+                                            <CardContent className="p-4">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <Lightbulb className="w-3.5 h-3.5" />
+                                                    <span className="text-sm font-semibold text-foreground">
+                                                        Hint 2
+                                                    </span>
+                                                </div>
+                                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                                        idk man just do it x2
+                                                    </p>
+                                            </CardContent>
+                                        </Card>
+                                    </div>
+                               </TabsContent>
+
+                              <TabsContent value='submissions' className="p-6 m-0">
+                                   to do, bcs submissions are not implemeneted yet
+                              </TabsContent>
+
                             </div>
                         </Tabs>
-                    </Tabs>
+                </div>
+
+                <div className="flex flex-col overflow-hidden">
+                    <div className="flex items-center justify-between border-b border-border/40 px-4 py-2">
+                            <div className="flex items-center gap-2">
+                               <select
+                                    value={language}
+                                    onChange={(e) => setLanguage(e.target.value)}
+                                    className="bg-secondary/40 border border-border/50 text-xs font-mono px-2 rounded-md outline-none focus:border-primary transition-colors"
+                                >
+                                    {possibleLanguages.map((lang) => (
+                                    <option key={lang} value={lang}>
+                                        {lang}
+                                    </option>
+                                    ))}
+                                </select>
+                            </div>
+                    </div>
+                </div>
+
+                <div className="flex-1 overflow-hidden flex flex-col">
+                     <div className="flex-1 overflow-auto">
+                        <textarea
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            className="w-full h-full min-h-[300px] bg-transparent text-foreground font-mono text-sm p-4 leading-relaxed resize-none outline-none selection:bg-primary/20"
+                            spellCheck={false}
+                        />
+                     </div>
+
+                     <div className="border-t border-border/40">
+                          <div className="flex items-center justify-between px-4 py-2 bg-secondary/20 border-b border-border/30">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+
+                                    </span>
+                                </div>
+                          </div>
+                     </div>
+
                 </div>
             </div>
         </div>
