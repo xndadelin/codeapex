@@ -15,6 +15,7 @@ import { useState } from "react";
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Card, CardContent } from "@/components/ui/card";
+import Editor from "@monaco-editor/react"
 
 // to do add hints dont forget, for now its hardcoded lmao
 
@@ -225,15 +226,24 @@ export default function ChallengePage() {
                                 </select>
                             </div>
                     </div>
-                </div>
 
                 <div className="flex-1 overflow-hidden flex flex-col">
                      <div className="flex-1 overflow-auto">
-                        <textarea
+                        <Editor
+                            height={"100%"}
+                            theme="vs-dark"
+                            language={language === "Python 3" ? "python" : language === "C/C++" ? "cpp" : "plaintext"}
                             value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            className="w-full h-full min-h-[300px] bg-transparent text-foreground font-mono text-sm p-4 leading-relaxed resize-none outline-none selection:bg-primary/20"
-                            spellCheck={false}
+                            onChange={(value) => setCode(value || "")}
+                            options={{
+                                fontSize: 14,
+                                fontFamily: 'JetBrains Mono, monospace',
+                                minimap: {
+                                    enabled: false
+                                },
+                                scrollBeyondLastLine: false,
+                                automaticLayout: true
+                            }}
                         />
                      </div>
 
@@ -246,6 +256,7 @@ export default function ChallengePage() {
                                 </div>
                           </div>
                      </div>
+                </div>
 
                 </div>
             </div>
