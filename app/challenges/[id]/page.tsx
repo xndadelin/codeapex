@@ -2,7 +2,6 @@
 
 import Loading from "@/app/loading";
 import { useChallenge } from "@/hooks/use-challenges";
-import { UUID } from "crypto";
 import { ArrowLeft, BookOpen, ChevronDown, Lightbulb, Play, Send, Terminal } from "lucide-react";
 import Error from "next/error";
 import Link from "next/link";
@@ -32,9 +31,9 @@ const possibleLanguages = [
 
 export default function ChallengePage() {
     const { id } = useParams()
-    const { data: challenge, isLoading } = useChallenge(id as UUID)
+    const { data: challenge, isLoading } = useChallenge(id as string)
     const [activeTab, setActiveTab] = useState("description")
-    const [language, setLanguage] = useState("Python 3")
+    const [language, setLanguage] = useState(possibleLanguages[0])
     const [code, setCode] = useState("")
 
     if(isLoading) {
@@ -43,6 +42,23 @@ export default function ChallengePage() {
 
     if(!challenge) {
         return <Error statusCode={404} />
+    }
+
+    const onHandleSubmit = async () => {
+        const res = await fetch("/api/test_code", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                code,
+                language,
+                challengeId: id
+            })
+        })
+
+        const data = await res.json()
+        console.log(data)
     }
 
     return (
@@ -82,6 +98,7 @@ export default function ChallengePage() {
                             size="sm"
                             variant={"outline"}
                             className="bg-transparent border-border/50 text-muted-foreground hover:text-foreground gap-1.5 text-xs"
+                            onClick={onHandleSubmit}
                         >
                             <Send className="w-3.5 h-3.5" />
                             Submit
@@ -226,9 +243,7 @@ export default function ChallengePage() {
                                 </select>
                             </div>
                     </div>
-
-                <div className="flex-1 overflow-hidden flex flex-col">
-                     <div className="flex-1 overflow-auto">
+                                         <div className="flex-1 overflow-auto">
                         <Editor
                             height={"100%"}
                             theme="vs-dark"
@@ -246,18 +261,6 @@ export default function ChallengePage() {
                             }}
                         />
                      </div>
-
-                     <div className="border-t border-border/40">
-                          <div className="flex items-center justify-between px-4 py-2 bg-secondary/20 border-b border-border/30">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-
-                                    </span>
-                                </div>
-                          </div>
-                     </div>
-                </div>
-
                 </div>
             </div>
         </div>

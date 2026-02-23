@@ -14,15 +14,15 @@ interface Challenge_Line {
 }
 
 interface TestCase {
-    id: UUID,
-    challenge_id: UUID,
+    id: string,
+    challenge_id: string,
     input: string,
     output: string,
     is_sample: boolean
 }
 
 interface Challenge {
-    id: UUID,
+    id: string,
     title: string,
     difficulty: string,
     category: string,
@@ -52,12 +52,12 @@ export const challengeKeys = {
     list: (filters?: { is_public?: boolean }) => [...challengeKeys.lists(), filters ?? {}] as const,
     listLine: (scope: "public" | "admin") => [...challengeKeys.all, "list-line", scope] as const,
     details: () => [...challengeKeys.all, "details"] as const,
-    detail: (id: UUID) => [...challengeKeys.details(), id] as const,
+    detail: (id: string) => [...challengeKeys.details(), id] as const,
     paginated: (page: number, pageSize: number, scope?: "public" | "admin", searchQuery?: string | "") => 
         [...challengeKeys.all, "paginated", { page, pageSize, scope, searchQuery}] as const 
 }
 
-export function useChallenge(id: UUID) {
+export function useChallenge(id: string) {
     return useQuery<Challenge>({
         queryKey: challengeKeys.detail(id),
         queryFn: async() => {
