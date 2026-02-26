@@ -15,6 +15,8 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { Card, CardContent } from "@/components/ui/card";
 import Editor from "@monaco-editor/react"
+import SubmissionResults from "@/components/submission-results";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 // to do add hints dont forget, for now its hardcoded lmao
 
@@ -35,6 +37,9 @@ export default function ChallengePage() {
     const [activeTab, setActiveTab] = useState("description")
     const [language, setLanguage] = useState(possibleLanguages[0])
     const [code, setCode] = useState("")
+    const [submissionResults, setResults] = useState()
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [showResults, setShowResults] = useState(false)
 
     if(isLoading) {
         return <Loading />
@@ -45,6 +50,8 @@ export default function ChallengePage() {
     }
 
     const onHandleSubmit = async () => {
+        setIsSubmitting(true)
+        setShowResults(true)
         const res = await fetch("/api/test_code", {
             method: "POST",
             headers: {
@@ -58,7 +65,8 @@ export default function ChallengePage() {
         })
 
         const data = await res.json()
-        console.log(data)
+        setResults(data.results)
+        setIsSubmitting(false)
     }
 
     return (
@@ -89,7 +97,7 @@ export default function ChallengePage() {
                         <Button
                             size="sm"
                             variant={"outline"}
-                            className="bg-transparent border-border/50 text-muted-foreground hover:text-foreground gap-1.5 text-xs"
+                            className="bg-transparent cursor-pointer border-border/50 text-muted-foreground hover:text-foreground gap-1.5 text-xs"
                         >
                             <Play className="w-3.5 h-3.5" />
                             Run
@@ -97,7 +105,7 @@ export default function ChallengePage() {
                         <Button
                             size="sm"
                             variant={"outline"}
-                            className="bg-transparent border-border/50 text-muted-foreground hover:text-foreground gap-1.5 text-xs"
+                            className="bg-transparent cursor-pointer border-border/50 text-muted-foreground hover:text-foreground gap-1.5 text-xs"
                             onClick={onHandleSubmit}
                         >
                             <Send className="w-3.5 h-3.5" />
@@ -262,6 +270,16 @@ export default function ChallengePage() {
                         />
                      </div>
                 </div>
+                <Dialog open={showResults} onOpenChange={setShowResults}>
+                    <DialogContent className="w-[95vw] max-w-[95vw] max-w-[95vw]  max-h-[80vh] overflow-y-auto bg-background border-border/60">
+                        <DialogHeader>
+                            <DialogTitle className="text-sm font-mono uppercase tracking-widest text-muted-foreground">
+                                Submission results
+                            </DialogTitle>
+                        </DialogHeader>
+                        <SubmissionResults results={submissionResults || []} isLoading={isSubmitting} />
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     )
