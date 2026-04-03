@@ -24,7 +24,7 @@ export function useSubmissionResultsLines(challengeId: string) {
     return useQuery<SubmissionLine[]>({
         queryKey: submissionKeys.list(challengeId),
         queryFn: async () => {
-            const response = await fetch(`/api/submissions?challenge_id=${challengeId}`);
+            const response = await fetch(`/api/submissions/challenge/${challengeId}`);
             if (!response.ok) {
                 throw new Error("oops! failed to fetch submissions")
             }
