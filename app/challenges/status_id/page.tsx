@@ -10,8 +10,6 @@ const statuses = [
     { id: 4, name: "Wrong answer", description: "The code executed successfully, but the output did not match the expected output.", color: "text-red-500" },
     { id: 5, name: "TLE (Time limit exceeded)", description: "Execution time exceeded the time limit set for the challenge.", color: "text-orange-500"},
     { id: 6, name: "Compilation error", description: "The source code failed to compile/run.", color: "text-zinc-400"}
-
-
 ]
 
 export default function StatusIdPage() {
