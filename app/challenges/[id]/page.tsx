@@ -17,6 +17,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import Editor from "@monaco-editor/react"
 import SubmissionResults from "@/components/submission-results";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useSubmissionResultsLines } from "@/hooks/use-submissions";
 
 // to do add hints dont forget, for now its hardcoded lmao
 
@@ -56,6 +57,7 @@ export default function ChallengePage() {
     const [submissionResults, setResults] = useState<SubmissionResultsProps>()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [showResults, setShowResults] = useState(false)
+    const { data: submissions, isLoading: isLoadingSubmissions, isError: isErrorSubmissions } = useSubmissionResultsLines(id as string)
 
     if(isLoading) {
         return <Loading />

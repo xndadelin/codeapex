@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient()
 
-    const { data, error } = await supabase.from("submissions").select("*").eq("challenge_id", challengeId)
+    const { data, error } = await supabase.from("submissions").select("id, user_id, created_at, total_tests, passed_tests, overall_status").eq("challenge_id", challengeId)
 
     if(error) {
         return NextResponse.json({
@@ -25,6 +25,6 @@ export async function GET(request: NextRequest) {
             status: 500
         })
     }
-
+    
     return NextResponse.json(data)
 }

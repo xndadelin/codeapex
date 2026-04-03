@@ -8,6 +8,7 @@ interface SubmissionLine {
     created_at: Date,
     total_tests: number,
     passed_tests: number
+    overall_status: string
 }
 
 
