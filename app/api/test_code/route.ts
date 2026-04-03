@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     if(submissionError) {
       return NextResponse.json({
-        error: "Failed to save submission"
+        error: "Failed to save submission" + submissionError.message
       }, {
         status: 500
       })
