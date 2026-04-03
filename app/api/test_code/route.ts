@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     if(!user) {
       return NextResponse.json({
-        error: "Unauthorized"
+        error: "Unauthorized. You must be logged in to submit code!"
       }, {
         status: 401
       })
@@ -109,12 +109,12 @@ export async function POST(request: NextRequest) {
         status: 500
       })
     }
-
-    
  
     return NextResponse.json({
       results,
     });
+
+
   } catch (error) {
     console.log(error)
     return NextResponse.json({

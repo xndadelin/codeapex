@@ -2,7 +2,7 @@
 
 import Loading from "@/app/loading";
 import { useChallenge } from "@/hooks/use-challenges";
-import { ArrowLeft, BookOpen, ChevronDown, Lightbulb, Play, Send, Terminal } from "lucide-react";
+import { ArrowLeft, BookOpen, ChevronDown, Lightbulb, Play, Send, Terminal, XCircle, XSquare } from "lucide-react";
 import Error from "next/error";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -31,13 +31,28 @@ const possibleLanguages = [
     'C/C++'
 ]
 
+
+interface TestResult {
+    input: string,
+    status: string,
+    accepted: string,
+    time: string | null,
+    memory: number | null
+    output: string
+}
+
+interface SubmissionResultsProps {
+    results: TestResult[]
+    isLoading?: boolean,
+    error: string | null
+}
 export default function ChallengePage() {
     const { id } = useParams()
     const { data: challenge, isLoading } = useChallenge(id as string)
     const [activeTab, setActiveTab] = useState("description")
     const [language, setLanguage] = useState(possibleLanguages[0])
     const [code, setCode] = useState("")
-    const [submissionResults, setResults] = useState()
+    const [submissionResults, setResults] = useState<SubmissionResultsProps>()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [showResults, setShowResults] = useState(false)
 
@@ -65,7 +80,17 @@ export default function ChallengePage() {
         })
 
         const data = await res.json()
-        setResults(data.results)
+        if(data.error) {
+            setResults({
+                results: [],
+                error: data.error
+            })
+        } else {
+            setResults({
+                results: data.results,
+                error: null
+            })
+        }
         setIsSubmitting(false)
     }
 
@@ -277,7 +302,20 @@ export default function ChallengePage() {
                                 Submission results
                             </DialogTitle>
                         </DialogHeader>
-                        <SubmissionResults results={submissionResults || []} isLoading={isSubmitting} />
+                        <SubmissionResults results={submissionResults?.results || []} isLoading={isSubmitting} error={null} />
+                        {(!submissionResults || submissionResults.error)  && !isSubmitting && (
+                            <div className="flex flex-col items-center justify-center py-12 gap-3">
+                                <XSquare className="w-12 h-12 text-red-400" />
+                                <span className="text-sm text-muted-foreground">
+                                    An error has occured while processing your submission. Please try again later.
+                                    {submissionResults?.error && (
+                                        <div className="mt-2 text-xs text-red-400 text-center">
+                                            {submissionResults.error}
+                                        </div>
+                                    )}
+                                </span>
+                            </div>
+                        )}
                     </DialogContent>
                 </Dialog>
             </div>

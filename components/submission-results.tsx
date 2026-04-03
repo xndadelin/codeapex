@@ -16,7 +16,8 @@ interface TestResult {
 
 interface SubmissionResultsProps {
     results: TestResult[]
-    isLoading?: boolean
+    isLoading?: boolean,
+    error: string | null
 }
 
 function ResultRow({ result, index } : { result: TestResult, index: number }) {
