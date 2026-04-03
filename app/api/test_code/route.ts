@@ -68,16 +68,18 @@ export async function POST(request: NextRequest) {
       return res.json();
     };
 
+
     const results = await Promise.all(
       testCases.map(async (tc: { input: string; output: string }) => {
         const data = await runTest(tc.input);
         return {
           input: tc.input,
-          status: data.status?.description,
+          status: data.status?.description === "Accepted" ? "NE" : data.status?.description,
           output: data.stdout || data.stderr,
           accepted: data.stdout?.trim() === tc.output.trim(),
           time: data.time,
           memory: data.memory,
+          status_id: data.status?.id
         };
       }),
     );

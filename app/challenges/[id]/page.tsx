@@ -39,6 +39,7 @@ interface TestResult {
     time: string | null,
     memory: number | null
     output: string
+    status_id: number | null
 }
 
 interface SubmissionResultsProps {

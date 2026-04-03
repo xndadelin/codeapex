@@ -11,7 +11,8 @@ interface TestResult {
     accepted: string,
     time: string | null,
     memory: number | null
-    output: string
+    output: string,
+    status_id: number | null
 }
 
 interface SubmissionResultsProps {
