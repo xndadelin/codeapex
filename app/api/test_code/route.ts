@@ -9,6 +9,16 @@ const languageMap: Record<string, number> = {
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
+    const { data: { user }} = await supabase.auth.getUser();
+
+    if(!user) {
+      return NextResponse.json({
+        error: "Unauthorized"
+      }, {
+        status: 401
+      })
+    }
+
     const { code, language, challengeId } = await request.json();
 
     if (!code || !language || !languageMap[language] || !challengeId) {
@@ -72,6 +82,36 @@ export async function POST(request: NextRequest) {
       }),
     );
 
+    if(!results) {
+      return NextResponse.json({
+        error: "Failed to run tests"
+      }, {
+        status: 500
+      })
+    }
+
+    const { error: submissionError } = await supabase.from("submissions").insert({
+      user_id: user.id,
+      challenge_id: challengeId,
+      source_code: code,
+      language_name: language,
+      total_tests: testCases.length,
+      passed_tests: results.filter(r => r.accepted).length,
+      test_results: results,
+      max_time: Math.max(...results.map(r => r.time || 0)),
+      max_memory: Math.max(...results.map(r => r.memory || 0))
+    }) 
+
+    if(submissionError) {
+      return NextResponse.json({
+        error: "Failed to save submission"
+      }, {
+        status: 500
+      })
+    }
+
+    
+ 
     return NextResponse.json({
       results,
     });
