@@ -1,12 +1,17 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Clock } from "lucide-react";
+import { Activity, CheckCircle, CheckCircle2, Clock } from "lucide-react";
 
 const statuses = [
-    {
-        id: 1, name: "In Queue", description: "The submission is waiting to be processed by a worker.", color: "text-blue-400 border-blue-400/30 bg-blue-400/10", icon: Clock
-    }
+    { id: 1, name: "In queue", description: "The submission is waiting to be processed by a worker.", color: "text-blue-500" },
+    { id: 2, name: "Processing", description: "Worker has picked up the task and is executing the code.", color: "text-amber-500" },
+    { id: 3, name: "Accepted", description: "The code executed successfully and the output matched the expected output.", color: "text-emerald-500" },
+    { id: 4, name: "Wrong answer", description: "The code executed successfully, but the output did not match the expected output.", color: "text-red-500" },
+    { id: 5, name: "TLE (Time limit exceeded)", description: "Execution time exceeded the time limit set for the challenge.", color: "text-orange-500"},
+    { id: 6, name: "Compilation error", description: "The source code failed to compile/run.", color: "text-zinc-400"}
+
+
 ]
 
 export default function StatusIdPage() {
@@ -45,8 +50,7 @@ export default function StatusIdPage() {
                                     </TableCell>
                                     <TableCell className="py-4">
                                         <div className="flex items-center gap-2">
-                                            <status.icon className={`w-3.5 h-3.5 ${status.color.split(' ')[0]}`} />
-                                            <span className={`text-xs font-mono font-bold uppercase tracking-tight ${status.color.split(' ')[0]}`}>
+                                            <span className={`text-xs font-mono font-bold uppercase tracking-tight ${status.color}`}>
                                                 {status.name}
                                             </span>
                                         </div>
