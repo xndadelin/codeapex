@@ -18,6 +18,7 @@ import Editor from "@monaco-editor/react"
 import SubmissionResults from "@/components/submission-results";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useSubmissionResultsLines } from "@/hooks/use-submissions";
+import { TableHeader, Table, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 
 // to do add hints dont forget, for now its hardcoded lmao
 
@@ -48,6 +49,19 @@ interface SubmissionResultsProps {
     isLoading?: boolean,
     error: string | null
 }
+
+interface SubmissionLine {
+    id: string,
+    user_id: string,
+    challenge_id: string, 
+    status_id: string,
+    created_at: Date,
+    total_tests: number,
+    passed_tests: number
+    overall_status: string
+}
+
+
 export default function ChallengePage() {
     const { id } = useParams()
     const { data: challenge, isLoading } = useChallenge(id as string)
@@ -256,7 +270,84 @@ export default function ChallengePage() {
                                </TabsContent>
 
                               <TabsContent value='submissions' className="p-6 m-0">
-                                   to do, bcs submissions are not implemeneted yet
+                                   {isLoadingSubmissions ? (
+                                      <Loading />
+                                   ): submissions && submissions.length > 0 ? (
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow className="hover:bg-transparent border-border/40">
+                                                    <TableHead className="w-[100px] text-[10px] uppercase font-mono">
+                                                        Status
+                                                    </TableHead>
+                                                    <TableHead className="text-[10px] uppercase font-mono text-center">
+                                                        Score
+                                                    </TableHead>
+                                                    <TableHead className="text-[10px] uppercase font-mono text-right">
+                                                        Date
+                                                    </TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {submissions.map((sub: SubmissionLine) => {
+                                                    const percentage = sub.total_tests > 0 ? Math.round((sub.passed_tests / sub.total_tests) * 100) : 0
+                                                    const isPassed = sub.overall_status === 'Accepted' || percentage === 100
+
+                                                    return (
+                                                        <TableRow key={sub.id} className="border-border/20 hover:bg-secondary/10 transition-all cursor-pointer drop">
+                                                            <TableCell className="py-4 pl-6">
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span className={`text-[11px] font-bold font-mono tracking-tight ${
+                                                                        isPassed ? "text-emerald-400" : "text-red-400"
+                                                                    }`}>
+                                                                        {sub.overall_status || (percentage === 100 ? "Accepted" : "Failed" )}
+                                                                    </span>
+                                                                    <span className="text-[9px] text-muted-foreground font-mono">
+                                                                        ID: {sub.id.slice(0,9)}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="py-4">
+                                                                <div className="flex flex-col items-center gap-1.5">
+                                                                    <div className="flex items-end gap-1 font-mono">
+                                                                        <span className="text-sm font-bold leading-none">
+                                                                            {percentage}%
+                                                                        </span>
+                                                                    </div>
+                                                                    <span className="text-[9px] text-muted-foreground font-mono uppercase tracking-widest">
+                                                                        {sub.passed_tests} / {sub.total_tests} tests
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+
+                                                            <TableCell className="py-4 pr-6 text-right">
+                                                                <div className="flex flex-col items-end gap-1 font-mono">
+                                                                    <span className="text-[11px] text-foreground">
+                                                                        {new Date(sub.created_at).toLocaleDateString(undefined, {
+                                                                            month: "short",
+                                                                            day: "numeric"
+                                                                        })}
+                                                                    </span>
+                                                                    <span className="text-[10px] text-muted-foreground">
+                                                                        {new Date(sub.created_at).toLocaleDateString(undefined, {
+                                                                            hour: '2-digit',
+                                                                            minute: '2-digit'
+                                                                        })}
+                                                                    </span>
+                                                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                   ) : (
+                                    <div className="flex flex-col items-center justify-center py-20 opacity-40">
+                                        <XCircle className="w-10 h-10 mb-4 stroke-[1px]" />
+                                        <p className="text-xs font-mono tracking-tighter">
+                                            No attempts recorded for this challenge yet.
+                                        </p>
+                                    </div>
+                                   )}
                               </TabsContent>
 
                             </div>

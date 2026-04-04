@@ -85,8 +85,8 @@ export function Navbar() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant={"ghost"} size="icon" className="rounded-full">
                                     <Avatar>
-                                    <AvatarImage src={user?.user_metadata?.avatar_url} alt="pfp" />
-                                </Avatar>
+                                        <AvatarImage src={user?.user_metadata?.avatar_url} alt="pfp" />
+                                    </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-32">
@@ -135,13 +135,29 @@ export function Navbar() {
                                 {link.label}
                             </Link>
                         ))}
-                        <div className="flex flex-col gap-2 pt-4 border-5 border-border/50 mt-2">
-                            {!isAuthenticated ? (
+                       {isAuthenticated && (
+                            <div className="flex flex-col gap-1 mt-2 border-t border-border/50 pt-2">
+                                <Link href="/profile" className="py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                                    Profile
+                                </Link>
+                                <Link href="/settings" className="py-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                                    Settings
+                                </Link>
+                                <Button onClick={() => {
+                                    logoutmutation.mutate()
+                                    setMobileOpen(false)
+                                }} className="cursor-pointer">
+                                    Logout
+                                </Button>
+                            </div>
+                       )}
+                        <div className="flex flex-col gap-2 mt-2">
+                            {!isAuthenticated && (
                                 <>
                                     <Button
                                         variant="ghost"
                                         size="sm"
-                                        className="justify-start text-muted-foreground"
+                                        className=" bg-secondary text-muted-foreground"
                                         asChild
                                     >
                                         <Link href={"/login"}>
@@ -158,30 +174,6 @@ export function Navbar() {
                                         </Link>
                                     </Button>
                                 </>
-                            ): (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant={"ghost"} size="icon" className="rounded-full">
-                                            <Avatar>
-                                            <AvatarImage src={user?.user_metadata?.avatar_url} alt="pfp" />
-                                        </Avatar>
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-32">
-                                        <DropdownMenuGroup>
-                                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                                            <DropdownMenuItem>Settings</DropdownMenuItem>
-                                        </DropdownMenuGroup>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuGroup>
-                                            <DropdownMenuItem variant="destructive" onClick={() => {
-                                                logoutmutation.mutate()
-                                            }}>
-                                                Logout
-                                            </DropdownMenuItem>
-                                        </DropdownMenuGroup>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
                             )}
                         </div>
                     </div>

@@ -184,7 +184,7 @@ export default function SigninPage() {
             <Button
                 type="submit"
                 disabled={true}
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11 doom-glow"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90 gap-2 h-11"
             >
                 {signinMutation.isPending ? (
                   <Loader2 className="w-4 h-4 animate-spin " />

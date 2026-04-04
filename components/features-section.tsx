@@ -61,7 +61,7 @@ export function FeaturesSection() {
                     {features.map((feature, index) => (
                         <Card
                             key={feature.title}
-                            className="group bg-card/50 border-border/50 hover:border-primary/30 transition-all duration-300 hover:doom-border-glow"
+                            className="group bg-card/50 border-border/50 hover:border-primary/30 transition-all duration-300"
                         >
                             <CardContent
                                 className="p-6"

@@ -71,7 +71,7 @@ export function HeroSection() {
                     <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
                         <Button
                             size={"lg"}
-                            className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-8 h-12 text-base doom-glow"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 gap-2 px-8 h-12 text-base"
                             asChild
                         >
                             <Link href="/signup">
@@ -106,7 +106,7 @@ export function HeroSection() {
                     </div>
 
                     <div className="mt-20 w-full max-w-3xl">
-                        <div className="rounded-lg border border-border/60 bg-card overflow-hidden doom-border-glow">
+                        <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
                             <div className="flex items-center gap-2 px-4 py-3 bg-secondary/50 border-b border-border/50">
                                 <div className="flex gap-1.5">
                                     <div className="w-2.5 h-2.5 rounded-full bg-destructive/80" />
